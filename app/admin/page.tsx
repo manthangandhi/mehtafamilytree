@@ -14,7 +14,7 @@ export default async function AdminOverview() {
     <div className="p-8 max-w-6xl mx-auto animate-fade-in">
       <div className="mb-10">
         <h1 className="text-4xl font-serif font-bold tracking-tight text-foreground">Admin Dashboard</h1>
-        <p className="text-base text-muted mt-2">Manage the family directory. All changes are securely audited.</p>
+        <p className="text-base text-muted mt-2">Manage the Mehta Kutumb family archive. All changes are securely audited.</p>
       </div>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">

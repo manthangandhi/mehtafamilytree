@@ -52,7 +52,7 @@ export default async function RequestDetail({ params }: { params: Promise<{ id: 
         <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
           {/* Approve - prominent but with warning */}
           <form action={approve} className="card p-5 border-border">
-            <div className="uppercase text-[10px] tracking-widest font-semibold text-emerald-700 mb-1">Approve &amp; Apply to Live Directory</div>
+            <div className="uppercase text-[10px] tracking-widest font-semibold text-emerald-700 mb-1">Approve &amp; Apply to Live Archive</div>
             <div className="text-sm mb-3 text-muted">This will immediately apply the proposed changes to the live tables and record an audit entry.</div>
             <Textarea name="admin_notes" label="Admin notes (optional)" placeholder="Verified with family elder / documents checked" />
             <Button type="submit" variant="primary" className="mt-3 w-full">Approve &amp; Apply Changes</Button>

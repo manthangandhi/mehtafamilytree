@@ -124,7 +124,7 @@ export default function LoginPage() {
             </svg>
           </div>
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">Welcome back</h1>
-          <p className="mt-1 text-sm text-muted">Sign in to access the family directory</p>
+          <p className="mt-1 text-sm text-muted">Sign in to access the Mehta Kutumb</p>
         </div>
 
         <Suspense fallback={<div className="card p-8 text-sm text-muted">Loading...</div>}>

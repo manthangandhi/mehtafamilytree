@@ -22,7 +22,7 @@ export default function FamilyTreeClient({ treeData }: FamilyTreeClientProps) {
   return (
     <div className="flex flex-col min-h-screen pt-10">
       <div className="mb-12">
-        <h1 className="font-serif text-[36px] leading-[44px] font-semibold text-foreground mb-4">Family Directory</h1>
+        <h1 className="font-serif text-[36px] leading-[44px] font-semibold text-foreground mb-4">Mehta Kutumb Lineage</h1>
         <p className="text-muted max-w-2xl text-lg">
           Connecting the threads of our lineage across generations. Discover kin through their legacy, expertise, and ancestral roots.
         </p>

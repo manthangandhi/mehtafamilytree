@@ -107,7 +107,7 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f5f7]">
+    <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 py-10">
         
         {/* Welcome Header */}
@@ -118,12 +118,12 @@ export default async function DashboardPage() {
               <StatusBadge status={profile.status} />
               {profile.role === 'admin' && <StatusBadge status="admin" />}
             </div>
-            <p className="text-[15px] text-muted">Your family directory dashboard</p>
+            <p className="text-[15px] text-muted">Your Mehta Kutumb family hub</p>
           </div>
           <div className="flex flex-wrap gap-3 mt-4 md:mt-0">
             <Link href="/directory/print" className="btn btn-secondary">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
-              Print Directory
+              Print Family Record
             </Link>
             <Link href="/announcements" className="btn btn-primary">
               View Announcements
@@ -207,8 +207,8 @@ export default async function DashboardPage() {
                <div className="grid sm:grid-cols-2 gap-4">
                   <Link href="/directory" className="group p-4 rounded-xl bg-surface-hover border border-border/50 hover:border-primary/30 transition-all">
                     <div className="flex items-center gap-3 font-medium text-foreground group-hover:text-primary">
-                      <div className="p-2 bg-surface border border-border/50 rounded-lg shadow-sm text-primary"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
-                      Search Directory
+                      <img src="/images/hero-tree.png" alt="" className="w-9 h-9 rounded-lg object-contain border border-border/50 p-0.5" />
+                      Search Households
                     </div>
                   </Link>
                   <Link href="/family-tree" className="group p-4 rounded-xl bg-surface-hover border border-border/50 hover:border-primary/30 transition-all">
@@ -250,7 +250,7 @@ export default async function DashboardPage() {
                           {celeb.avatarUrl ? (
                             <img src={celeb.avatarUrl} alt={celeb.name} className="w-full h-full object-cover" />
                           ) : (
-                            <span className="text-sm font-bold text-primary">{celeb.name.charAt(0)}</span>
+                            <img src="/images/hero-tree.png" alt="Family symbol" className="w-full h-full object-cover opacity-70" />
                           )}
                         </div>
                         <div className="flex-1 min-w-0">

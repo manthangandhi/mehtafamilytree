@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { Footer } from "@/components/layout/Footer";
+import CookieBanner from "@/components/CookieBanner";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -16,10 +17,13 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Digital Family Directory",
-  description: "Preserving our family roots, relationships, and traditions across generations.",
+  title: "Mehta Kutumb",
+  description: "Our family legacy across generations and borders. A secure digital archive for the Mehta family.",
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/images/kutumb-icon.jpg", sizes: "any" },
+    ],
+    apple: "/images/kutumb-icon.jpg",
   },
 };
 
@@ -37,6 +41,7 @@ export default function RootLayout({
         <AppHeader />
         <div className="flex-1 pt-24 pb-12">{children}</div>
         <Footer />
+        <CookieBanner />
         <Toaster position="top-center" richColors closeButton />
       </body>
     </html>

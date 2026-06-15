@@ -62,11 +62,11 @@ export default async function HouseholdDetailPage({ params }: { params: Promise<
 
   return (
     <div className="min-h-screen">
-      <div className="mx-auto max-w-4xl px-6 py-8">
+      <div className="mx-auto max-w-7xl px-6 py-8">
 
         {/* Breadcrumb */}
         <nav className="mb-6 flex items-center gap-2 text-sm text-muted animate-fade-in">
-          <Link href="/directory" className="hover:text-primary transition-colors">Directory</Link>
+          <Link href="/directory" className="hover:text-primary transition-colors">Households</Link>
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="m9 18 6-6-6-6"/>
           </svg>
@@ -74,23 +74,20 @@ export default async function HouseholdDetailPage({ params }: { params: Promise<
         </nav>
 
         <div className="mb-6 animate-fade-in">
-          <div className="flex items-start gap-3">
-            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-amber-50 text-primary">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <div className="flex items-start gap-4">
+            <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-primary/5 text-primary border border-border/70">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
               </svg>
             </div>
             <div>
-              <h1 className="text-3xl font-semibold tracking-tight text-foreground">{household.primary_member_name}</h1>
-              <div className="mt-1 text-muted">
+              <h1 className="text-4xl font-semibold tracking-[-0.02em] text-foreground">{household.primary_member_name}</h1>
+              <div className="mt-1 text-[15px] text-muted">
                 {[household.native_place, household.city, household.state, household.country].filter(Boolean).join(', ')}
               </div>
               {household.verified && (
-                <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700 border border-border">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12"/>
-                  </svg>
-                  VERIFIED RECORD
+                <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-0.5 text-xs font-semibold text-emerald-700 border border-emerald-100">
+                  ✓ VERIFIED FAMILY RECORD
                 </span>
               )}
             </div>
@@ -200,8 +197,12 @@ export default async function HouseholdDetailPage({ params }: { params: Promise<
                         <tr key={hm.id} className={isHead ? 'bg-amber-50/30' : ''}>
                           <td className={`font-medium ${isHead ? 'text-emerald-700' : 'text-foreground'}`}>
                             <div className="flex items-center gap-3">
-                              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-stone-100 text-muted text-xs font-serif border border-border shadow-sm flex-shrink-0">
-                                {p?.full_name ? p.full_name.charAt(0) : '?'}
+                              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-stone-100 text-muted text-xs font-serif border border-border shadow-sm flex-shrink-0 overflow-hidden">
+                                {p?.avatar_url ? (
+                                  <img src={p.avatar_url} alt={p.full_name} className="w-full h-full object-cover" />
+                                ) : (
+                                  <img src="/images/hero-tree.png" alt="Family symbol" className="w-full h-full object-cover opacity-70" />
+                                )}
                               </div>
                               <div>
                                 {p?.full_name || '—'}
@@ -249,7 +250,7 @@ export default async function HouseholdDetailPage({ params }: { params: Promise<
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="m15 18-6-6 6-6"/>
             </svg>
-            Back to full directory search
+            Back to all households
           </Link>
         </div>
       </div>

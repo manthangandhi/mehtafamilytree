@@ -15,6 +15,7 @@ export const personSchema = z
     whatsapp_number: optionalPhone,
     email: optionalEmail,
     blood_group: z.string().trim().max(10).optional().or(z.literal('')),
+    avatar_url: z.string().url().optional().or(z.literal('')),
     notes: z.string().trim().max(2000).optional().or(z.literal('')),
     visibility_level: z.enum(['public', 'members', 'admin']).default('members'),
   })

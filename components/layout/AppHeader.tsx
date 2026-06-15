@@ -15,9 +15,14 @@ export function AppHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+    const supabase = createClient();
+
+    const fetchUser = async (currentUser?: any) => {
+      let user = currentUser;
+      if (!user) {
+        const { data: { user: fetchedUser } } = await supabase.auth.getUser();
+        user = fetchedUser;
+      }
       if (user) {
         const { data } = await supabase
           .from("profiles")
@@ -32,15 +37,30 @@ export function AppHeader() {
           isAdmin: profile?.role === "admin",
           isApproved: profile?.status === "approved",
         });
+      } else {
+        setUserState(null);
       }
     };
+
     fetchUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+        fetchUser(session?.user);
+      } else if (event === 'SIGNED_OUT') {
+        setUserState(null);
+      }
+    });
 
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   const initials = userState?.name?.substring(0, 2).toUpperCase() || "US";
@@ -76,17 +96,17 @@ export function AppHeader() {
             </svg>
           </div>
           <span className="font-serif font-bold text-2xl tracking-tight hidden sm:block text-foreground">
-            Directory.
+            Mehta Kutumb
           </span>
         </Link>
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-8">
           <Link href="/directory" className="text-sm font-medium text-muted hover:text-primary transition-colors">
-            Directory
+            Households
           </Link>
-          <Link href="/family-tree" className="text-sm font-medium text-muted hover:text-primary transition-colors">
-            Family Tree
+          <Link href="/family-tree-visualizer" className="text-sm font-medium text-muted hover:text-primary transition-colors">
+            Interactive Tree
           </Link>
           <Link href="/culture" className="text-sm font-medium text-muted hover:text-primary transition-colors">
             Culture
@@ -104,12 +124,20 @@ export function AppHeader() {
         {/* Right Actions */}
         <div className="flex items-center gap-4">
           {userState ? (
-            <Link
-              href="/my-profile"
-              className="hidden sm:flex h-10 w-10 items-center justify-center rounded-full bg-surface border border-border text-xs font-bold tracking-widest text-primary transition-all hover:bg-surface-hover shadow-sm"
-            >
-              {initials}
-            </Link>
+            <div className="hidden sm:flex items-center gap-3">
+              <Link
+                href="/my-profile"
+                className="h-10 w-10 flex items-center justify-center rounded-full bg-surface border border-border text-xs font-bold tracking-widest text-primary transition-all hover:bg-surface-hover shadow-sm"
+                title="My Profile"
+              >
+                {initials}
+              </Link>
+              <form action="/api/auth/signout" method="POST">
+                <button type="submit" className="text-xs font-bold text-muted hover:text-red-500 transition-colors uppercase tracking-wider">
+                  Sign Out
+                </button>
+              </form>
+            </div>
           ) : (
             <Link
               href="/login"
@@ -133,8 +161,8 @@ export function AppHeader() {
       {mobileMenuOpen && (
         <div className="absolute top-full left-0 right-0 bg-surface border-b border-border shadow-2xl md:hidden animate-fade-in origin-top">
           <nav className="flex flex-col p-6 gap-4">
-            <Link href="/directory" className="text-lg font-serif font-bold text-foreground">Directory</Link>
-            <Link href="/family-tree" className="text-lg font-serif font-bold text-foreground">Family Tree</Link>
+            <Link href="/directory" className="text-lg font-serif font-bold text-foreground">Households</Link>
+            <Link href="/family-tree-visualizer" className="text-lg font-serif font-bold text-foreground">Interactive Tree</Link>
             <Link href="/culture" className="text-lg font-serif font-bold text-foreground">Culture</Link>
             <Link href="/dashboard" className="text-lg font-serif font-bold text-foreground">Dashboard</Link>
             {userState?.isAdmin && (
@@ -142,7 +170,12 @@ export function AppHeader() {
             )}
             <hr className="border-border my-2" />
             {userState ? (
-              <Link href="/my-profile" className="text-lg font-serif font-medium text-muted">My Profile</Link>
+              <>
+                <Link href="/my-profile" className="text-lg font-serif font-medium text-muted">My Profile</Link>
+                <form action="/api/auth/signout" method="POST">
+                  <button type="submit" className="text-lg font-serif font-medium text-red-500 w-full text-left">Sign Out</button>
+                </form>
+              </>
             ) : (
               <Link href="/login" className="text-lg font-serif font-medium text-foreground">Sign In</Link>
             )}

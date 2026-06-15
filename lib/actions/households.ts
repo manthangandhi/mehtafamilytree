@@ -53,6 +53,7 @@ export async function createHouseholdAction(formData: unknown) {
       whatsapp_number: primaryRow.whatsapp_number || null,
       email: primaryRow.email || null,
       blood_group: primaryRow.blood_group || null,
+      avatar_url: primaryRow.avatar_url || null,
       notes: primaryRow.notes || null,
       created_by: current.id,
     };
@@ -134,6 +135,7 @@ export async function createHouseholdAction(formData: unknown) {
         whatsapp_number: m.whatsapp_number || null,
         email: m.email || null,
         blood_group: m.blood_group || null,
+        avatar_url: m.avatar_url || null,
         notes: m.notes || null,
         created_by: current.id,
       };
@@ -355,6 +357,7 @@ export async function addMembersToHouseholdAction(householdId: string, membersDa
         whatsapp_number: m.whatsapp_number || null,
         email: m.email || null,
         blood_group: m.blood_group || null,
+        avatar_url: m.avatar_url || null,
         notes: m.notes || null,
         created_by: current.id,
       };

@@ -19,8 +19,9 @@ export default async function CultureIndex() {
               <p className="text-[17px] text-muted leading-relaxed mb-8">
                 Explore the stories, traditions, and collective wisdom passed down through generations. These sacred documents form the foundation of our heritage.
               </p>
-              <div className="h-40 w-full rounded-2xl bg-surface-hover border border-border/50 flex items-center justify-center p-6 text-center">
-                 <p className="text-sm font-serif italic text-muted">"A family's history is an anchor in the storm."</p>
+              <div className="relative h-44 w-full rounded-3xl border border-border/60 overflow-hidden bg-surface flex items-center justify-center p-5 text-center">
+                <img src="/images/hero-tree.png" alt="Heritage" className="absolute inset-0 w-full h-full object-cover opacity-10" />
+                <p className="relative font-serif text-lg italic text-foreground">"A family's history is an anchor in the storm."</p>
               </div>
             </div>
           </div>

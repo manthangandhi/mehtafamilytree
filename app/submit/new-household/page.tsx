@@ -61,7 +61,7 @@ export default function SubmitNewHouseholdPage() {
     <div className="mx-auto max-w-4xl px-6 py-8">
       <div className="mb-8">
         <h1 className="font-serif text-2xl">Submit New Household</h1>
-        <p className="text-muted mt-2">Your submission will be reviewed by an administrator before it appears in the directory.</p>
+        <p className="text-muted mt-2">Your submission will be reviewed by an administrator before it appears in the family record.</p>
       </div>
 
       <div className="mt-6">

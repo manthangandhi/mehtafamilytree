@@ -107,7 +107,7 @@ export function HouseholdForm({
       </div>
       {mode === 'member-request' && (
         <p className="text-center text-xs text-primary">
-          This will be submitted as a pending request for admin review. It will not appear in the directory until approved.
+          This will be submitted as a pending request for admin review. It will not appear in the family record until approved.
         </p>
       )}
     </form>

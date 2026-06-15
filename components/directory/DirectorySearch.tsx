@@ -163,7 +163,7 @@ export function DirectorySearch({ initialFilters = {} }: Props) {
       )}
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        <Button type="submit" variant="primary">Search Directory</Button>
+        <Button type="submit" variant="primary">Search Our Family</Button>
         {hasActiveFilters && (
           <Button type="button" variant="secondary" onClick={clear}>Clear all filters</Button>
         )}

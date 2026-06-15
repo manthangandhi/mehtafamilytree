@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
+import { ImageUpload } from '@/components/ui/ImageUpload';
 import { relationshipToHeadSchema } from '@/lib/validations/shared';
 import type { FamilyMemberRow } from '@/lib/validations/household';
 
@@ -43,6 +44,7 @@ const defaultMember: FamilyMemberRow = {
   whatsapp_number: '',
   email: '',
   notes: '',
+  avatar_url: '',
   visibility_level: 'members' as const,
 };
 
@@ -82,20 +84,28 @@ export function FamilyMemberRepeater({ members, onChange, allowSelf = true }: Pr
         {members.map((m, idx) => {
           const isSelf = m.relationship_to_head === 'SELF';
           return (
-            <div key={idx} className="repeater-row">
+            <div key={idx} className="repeater-row relative">
               <div className="md:col-span-2 lg:col-span-3">
-                <div className="mb-2 flex items-center justify-between text-xs">
-                  <span className="font-medium text-muted">Member #{idx + 1} {isSelf && '(PRIMARY HEAD)'}</span>
+                <div className="mb-2 flex items-center justify-between text-xs border-b border-border pb-2">
+                  <span className="font-serif font-bold text-lg text-primary">Member #{idx + 1} {isSelf && '(PRIMARY HEAD)'}</span>
                   {(!isSelf || allowSelf) && (
                     <button
                       type="button"
                       onClick={() => removeMember(idx)}
-                      className="text-red-600 hover:underline"
+                      className="text-red-600 hover:underline flex items-center gap-1"
                     >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
                       Remove
                     </button>
                   )}
                 </div>
+              </div>
+
+              <div className="md:col-span-2 lg:col-span-3 mb-4">
+                <ImageUpload 
+                  value={m.avatar_url || ''} 
+                  onChange={(url) => updateMember(idx, 'avatar_url', url)} 
+                />
               </div>
 
               <Input

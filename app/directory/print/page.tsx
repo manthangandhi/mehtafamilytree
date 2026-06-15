@@ -92,7 +92,7 @@ export default async function PrintDirectoryPage() {
             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 10.5V6a1 1 0 0 0-1-1h-2.5"/><path d="M11 6V3a1 1 0 0 0-1-1H7.5"/><path d="M12 12H3"/><path d="M18 12h3"/><path d="M12 12v9"/><path d="M12 12L3 3"/><path d="m12 12 9-9"/></svg>
           </div>
           <h1 className="text-6xl md:text-7xl font-bold mb-4 tracking-tight text-primary">The Mehta Family</h1>
-          <h2 className="text-2xl text-muted tracking-widest uppercase mb-12">Heritage & Directory Book</h2>
+          <h2 className="text-2xl text-muted tracking-widest uppercase mb-12">Mehta Kutumb Heritage Record</h2>
           <div className="w-16 h-1 bg-primary/20 mx-auto mb-12"></div>
           <p className="text-sm text-muted font-sans uppercase tracking-widest">
             Generated on {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
@@ -117,7 +117,7 @@ export default async function PrintDirectoryPage() {
 
         {/* Directory Section */}
         <div>
-          <h1 className="text-4xl font-bold mb-12 uppercase tracking-widest border-b-2 border-primary inline-block pb-2 page-break">Directory of Households</h1>
+          <h1 className="text-4xl font-bold mb-12 uppercase tracking-widest border-b-2 border-primary inline-block pb-2 page-break">The Mehta Kutumb Households</h1>
           
           <div className="space-y-12">
             {(households as any[])?.map(household => (

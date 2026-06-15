@@ -71,7 +71,7 @@ export default function RegisterPage() {
               <line x1="22" x2="16" y1="11" y2="11" />
             </svg>
           </div>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Join the Directory</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Join the Mehta Kutumb</h1>
           <p className="mt-1 text-sm text-muted">Create an account. An admin will approve your access.</p>
         </div>
 

@@ -31,7 +31,7 @@ export function AdminSidebar() {
               href={l.href}
               className={`block rounded-xl px-3 py-2 transition-all duration-200 ${
                 active 
-                  ? 'bg-blue-50/80 text-blue-600 shadow-sm' 
+                  ? 'bg-primary/10 text-primary shadow-sm' 
                   : 'text-muted hover:bg-surface/80 hover:text-foreground'
               }`}
             >
