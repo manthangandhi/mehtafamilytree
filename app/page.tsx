@@ -1,16 +1,35 @@
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { HouseholdCard } from '@/components/directory/HouseholdCard';
 
 export default async function Home() {
-  // Fetch live public household data for the homepage teaser cards
   const supabase = await createClient();
-  const { data: households } = await supabase
+
+  // Live summary statistics for the family (public, safe aggregates)
+  const { count: householdCount } = await supabase
     .from('public_households_view')
-    .select('*')
+    .select('*', { count: 'exact', head: true })
+    .eq('status', 'active');
+
+  const { count: personCount } = await supabase
+    .from('public_persons_view')
+    .select('*', { count: 'exact', head: true })
+    .eq('status', 'active');
+
+  const { count: livingCount } = await supabase
+    .from('public_persons_view')
+    .select('*', { count: 'exact', head: true })
     .eq('status', 'active')
-    .order('primary_member_name')
-    .limit(4);
+    .eq('is_deceased', false);
+
+  const { data: countriesRaw } = await supabase
+    .from('public_households_view')
+    .select('country')
+    .eq('status', 'active')
+    .not('country', 'is', null);
+
+  const countriesCount = new Set(
+    (countriesRaw || []).map((h: any) => h.country).filter(Boolean)
+  ).size;
 
   return (
     <>
@@ -51,11 +70,6 @@ export default async function Home() {
 
           <p className="mt-6 text-xs text-muted tracking-[1.5px]">PRIVATE • APPROVED MEMBERS ONLY • BUILT FOR THE MEHTA FAMILY</p>
         </div>
-
-        {/* Subtle decorative use of the original tree image as a small elegant mark */}
-        <div className="absolute bottom-8 right-8 hidden lg:block opacity-40">
-          <img src="/images/hero-tree.png" alt="" className="w-20 h-20 object-contain" />
-        </div>
       </div>
 
       {/* Legacy Stats Bar — proud representative numbers for the real family */}
@@ -83,29 +97,38 @@ export default async function Home() {
         </div>
       </div>
 
-      {/* LIVE CARDS — actual households from the database (public view) */}
-      <div className="family-section py-16">
-        <div className="text-center mb-10">
-          <div className="text-xs uppercase tracking-[0.35em] text-accent font-semibold mb-2">THE LIVING KUTUMB</div>
-          <h2 className="page-title">Our Households</h2>
-          <p className="mt-3 text-muted max-w-md mx-auto">A small glimpse of the homes that make up our one big family. Every record is part of the same story.</p>
+      {/* LIVE SUMMARY STATS — total persons, households, countries etc. from actual data */}
+      <div className="family-section py-14">
+        <div className="text-center mb-8">
+          <div className="text-xs uppercase tracking-[0.35em] text-accent font-semibold mb-1">THE MEHTA KUTUMB TODAY</div>
+          <h2 className="page-title">Our Family at a Glance</h2>
+          <p className="mt-2 text-muted">Live numbers from our shared records.</p>
         </div>
 
-        {households && households.length > 0 ? (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {households.map((h: any) => (
-              <HouseholdCard key={h.id} household={h} isApproved={false} />
-            ))}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="stat-card py-7">
+            <div className="font-serif text-5xl font-bold text-primary tracking-tighter">{householdCount ?? '—'}</div>
+            <div className="mt-1 text-sm font-semibold text-muted tracking-[1.5px]">HOUSEHOLDS</div>
+            <div className="text-[11px] text-muted mt-0.5">Active family homes</div>
           </div>
-        ) : (
-          <div className="text-center py-12 text-muted">No households published yet. Check back soon.</div>
-        )}
-
-        <div className="text-center mt-8">
-          <Link href="/directory" className="inline-flex items-center text-sm font-semibold text-primary hover:underline">
-            View the complete directory of households →
-          </Link>
+          <div className="stat-card py-7">
+            <div className="font-serif text-5xl font-bold text-primary tracking-tighter">{personCount ?? '—'}</div>
+            <div className="mt-1 text-sm font-semibold text-muted tracking-[1.5px]">FAMILY MEMBERS</div>
+            <div className="text-[11px] text-muted mt-0.5">Recorded in the Kutumb</div>
+          </div>
+          <div className="stat-card py-7">
+            <div className="font-serif text-5xl font-bold text-primary tracking-tighter">{livingCount ?? '—'}</div>
+            <div className="mt-1 text-sm font-semibold text-muted tracking-[1.5px]">LIVING TODAY</div>
+            <div className="text-[11px] text-muted mt-0.5">Current generation carriers</div>
+          </div>
+          <div className="stat-card py-7">
+            <div className="font-serif text-5xl font-bold text-primary tracking-tighter">{countriesCount}</div>
+            <div className="mt-1 text-sm font-semibold text-muted tracking-[1.5px]">COUNTRIES</div>
+            <div className="text-[11px] text-muted mt-0.5">Our branches span the world</div>
+          </div>
         </div>
+
+        <p className="text-center mt-6 text-xs text-muted">These numbers grow as our family contributes and records are lovingly maintained.</p>
       </div>
 
       {/* Rich Features Section — kept for depth and storytelling */}

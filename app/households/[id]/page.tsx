@@ -152,9 +152,22 @@ export default async function HouseholdDetailPage({ params }: { params: Promise<
                 {isApproved ? 'Family Members' : 'Primary Member (full list for approved members)'}
               </div>
               {isApproved && (
-                <Link href={`/submit/correction?household=${id}&name=${encodeURIComponent(household.primary_member_name)}`} className="text-xs text-primary hover:text-emerald-700 underline underline-offset-2">
-                  Suggest correction
-                </Link>
+                <>
+                  <Link 
+                    href={`/households/${id}/edit`} 
+                    className="inline-flex items-center gap-1.5 rounded-full bg-primary/5 hover:bg-primary/10 px-3 py-1 text-xs font-semibold text-primary border border-primary/20 transition-colors"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                    Edit Household &amp; Members
+                  </Link>
+                  <Link 
+                    href="/submit/new-household" 
+                    className="text-xs text-muted hover:text-primary underline underline-offset-2 ml-3"
+                    title="Add a new person or branch to this household"
+                  >
+                    + Add family member
+                  </Link>
+                </>
               )}
             </div>
 

@@ -19,10 +19,7 @@ export default async function CultureIndex() {
               <p className="text-[17px] text-muted leading-relaxed mb-8">
                 Explore the stories, traditions, and collective wisdom passed down through generations. These sacred documents form the foundation of our heritage.
               </p>
-              <div className="relative h-44 w-full rounded-3xl border border-border/60 overflow-hidden bg-surface flex items-center justify-center p-5 text-center">
-                <img src="/images/hero-tree.png" alt="Heritage" className="absolute inset-0 w-full h-full object-cover opacity-10" />
-                <p className="relative font-serif text-lg italic text-foreground">"A family's history is an anchor in the storm."</p>
-              </div>
+
             </div>
           </div>
           
@@ -54,6 +51,27 @@ export default async function CultureIndex() {
           </div>
         </div>
 
+      </div>
+    </div>
+
+    {/* Full-width bottom heritage banner with the family quote + tree image */}
+    <div className="relative mt-12 border-t border-border/60 bg-surface overflow-hidden">
+      <div className="absolute inset-0">
+        <img 
+          src="/images/hero-tree.png" 
+          alt="Heritage tree" 
+          className="absolute inset-0 w-full h-full object-cover opacity-[0.07]" 
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#f7f3eb]/70 to-[#f7f3eb]" />
+      </div>
+      <div className="relative max-w-4xl mx-auto px-6 py-14 text-center">
+        <p className="font-serif text-3xl md:text-[42px] leading-tight italic text-foreground tracking-[-0.01em]">
+          “A family's history is an anchor in the storm.”
+        </p>
+        <div className="mt-4 text-xs uppercase tracking-[3px] text-muted">— The Elders of the Mehta Kutumb</div>
+        <div className="mt-8 text-[13px] text-muted max-w-sm mx-auto">
+          These documents and the stories within them are our living connection to every generation that came before.
+        </div>
       </div>
     </div>
   );
