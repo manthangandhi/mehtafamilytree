@@ -1,0 +1,257 @@
+# AgentRecommendations.txt
+# Digital Family Directory — Features, Guard Rails, Gaps & Master Prompt
+# For a production-grade family lineage platform (one global family, 3000+ members, many households, roots across countries)
+
+This document synthesizes:
+- Everything currently built (verified via exhaustive code inspection)
+- All guard rails present today
+- Comprehensive recommendations for what the app **should** have to become a trusted, scalable, lineage-first final product
+- Legal, privacy, compliance, product design, app design, and genealogy best-practice considerations specific to a large dispersed family
+- A ready-to-use master prompt for further planning, backlog creation, or implementation agents
+
+**Important**: This is a planning/recommendation artifact only. No app code was changed. The exhaustive per-interaction QA testing (120+ items, every route/button/form/action/guard/edge) lives in `AgentQA.txt`.
+
+---
+
+## 1. Current Implemented Features & Functionalities (Verified)
+
+### Core Data Model & Lineage Foundation
+- **profiles**: Linked to Supabase auth.users. Fields: full_name, email, mobile_number, role (member/admin), status (pending/approved/rejected/blocked), timestamps.
+- **persons**: Rich individual records — full_name, gender, date_of_birth, date_of_death, is_deceased, education, occupation, marital_status, blood_group, mobile_number, whatsapp_number, email, notes, avatar_url (added), visibility_level, status, created_by/updated_by.
+- **households**: Household-centric (like printed books) — household_code, primary_member_name, primary_person_id, native_place, residence_address, business_address, phone_number, mobile_number, whatsapp_number, email, city, state, country, notes, anniversary_date (added), visibility_level, status, verified, timestamps.
+- **household_members**: Links person ↔ household with relationship_to_head enum (SELF, FATHER, MOTHER, WIFE, HUSBAND, SON, DAUGHTER, DAUGHTER IN LAW, SON IN LAW, GRAND SON, GRAND DAUGHTER, BROTHER, SISTER, OTHER), display_order, is_primary.
+- **relationships**: Person-to-person graph — person_id, related_person_id, relationship_type (father, mother, spouse, child, sibling, guardian, other), notes. Critical for true lineage.
+- **Automatic complex-family support**: lastWifeId heuristic in creation/approval flows. When members are added in natural order (wives first, then their children), the system creates:
+  - Bidirectional spouse links (to head)
+  - Child links (from head)
+  - Explicit mother links (from the most recent wife to her children)
+  This allows clear identification of "which wife is the mother of which son/child" via Family Links.
+- **change_requests**: Approval-only workflow (never direct live member edits). Supports: add_household, update_household, delete_household, add_person, update_person, mark_deceased, add/update/remove household_member, add/update/delete_relationship. Stores proposed_data + current_data (JSONB), status, admin_notes, rejection_reason.
+- **audit_logs**: Complete write audit for every privileged/admin action (action_type, table_name, record_id, old_data, new_data, performed_by).
+- **cultural_pages**: Rich Markdown content (history, gotra, rituals, etc.) with categories and visibility_level.
+- **announcements**: Event-based family notices (birth, marriage, passing, reunion, general) with dates.
+
+### Experiences by Role (Full Feature Set)
+**Visitor / Public**:
+- Landing page (hero + value props).
+- Directory search/filters (name, city, state, native_place, relationship, marital_status, is_deceased) using safe public views.
+- Household cards + limited persons results table.
+- Household detail (primary member + basic info only; contacts masked with PrivacyField).
+- Culture pages (public-visible Markdown content).
+- Register / Login flows.
+
+**Pending Users**:
+- Dashboard with status messaging.
+- Can still browse public data and submit change requests.
+- My Requests to track submissions + see rejection reasons.
+
+**Approved Members** (full private data + self-service):
+- Dashboard: status, quick links, upcoming celebrations (birthdays + anniversaries computed via date-fns), recent audit updates, announcements widget.
+- Full Directory (member views) + advanced filters + "Submit New Household" button.
+- Full Household Detail: rich members table (Name, Relationship to Head, DOB, Occupation, Education/Marital, Blood/Notes, Mobile via PrivacyField, Family Links column computed from relationships table).
+- Family Tree: Generated from real data (households + members + relationships). Client-side searchable list of household units with member avatars and inline relationship display.
+- Submit flows (all routed through change_requests only):
+  - New Household (HouseholdForm + FamilyMemberRepeater — supports complex multi-spouse input order for correct mother linking).
+  - Correction (user-friendly field form for any household/person — no raw JSON).
+  - Mark Deceased (respectful date + notes form).
+- My Profile: Prefilled form to update own details (creates audited correction request).
+- My Requests: Track all submissions with full status and admin feedback.
+- Announcements list.
+- Directory Print (approved-only printable family book view).
+- "Suggest correction" links from household detail.
+
+**Admin / Archivist (full stewardship)**:
+- Protected admin layout + sidebar navigation (Overview, Users, Households, Persons, Change Requests, Cultural Pages, Announcements, Audit Logs).
+- Overview: Live counts (pending users, pending requests, active households) + quick-action buttons.
+- Users: Full list + actions (Approve, Block, Make/Remove Admin, "Confirm Email" force-confirm via Supabase admin API + audit).
+- Households: List, New (full repeater), Edit (basic fields + "Add Missed Family Members" via AddMembersForm that reuses repeater + lineage logic), Deactivate (soft delete), public View link.
+- Persons: List + individual rich edit.
+- Change Requests: Queue + detailed Review page with RequestComparisonView (side-by-side current vs proposed). Approve applies changes live (replays exact lineage logic for add_household) + full audit. Reject with visible reason.
+- Cultural Pages & Announcements: Full CRUD (Markdown supported for culture).
+- Audit Logs: Complete read-only history of every privileged action.
+
+### Key Technical & Interaction Features
+- Unified AppHeader (self-contained client component that fetches profile, shows conditional nav + Admin link + avatar initials + responsive mobile menu).
+- FamilyMemberRepeater (dynamic add/remove members with full person fields + relationship_to_head enum).
+- PrivacyField component (graceful masking).
+- StatusBadge component.
+- Server Actions for all writes + Zod validation.
+- View switching (public_ vs member_ views) based on approval status.
+- Print support (dedicated /directory/print page + window.print trigger).
+- Soft deletes preferred, verified flag, visibility_level per record.
+- RevalidatePath on all changes.
+- Sonner toasts, loading/disabled states on forms, EmptyState components.
+
+---
+
+## 2. Current Guard Rails (All Verified)
+
+**Server-Side Authorization**:
+- `requireAdmin()` — Enforced in admin/layout.tsx and every admin action. Redirects non-admins.
+- `requireApprovedMember()` — Enforced for submit pages, my-profile, certain actions. Handles pending/blocked states with redirects.
+- `getCurrentUserProfile()` — Called on virtually every page to determine isApproved + status for conditional rendering, queries, and UI.
+
+**Database & Privacy**:
+- Row Level Security (RLS) policies using SECURITY DEFINER helpers: is_approved_member(), is_admin(), current_profile_id().
+- Database views: public_*_view (very limited safe fields) vs member_*_view (full for approved).
+- PrivacyField UI component that respects isApproved.
+- visibility_level column on households/persons/cultural_pages.
+- All privileged writes go through server actions using service-role client (never exposed to browser).
+- change_requests as the only path for member-originated changes (no direct live updates).
+
+**Auth Layer**:
+- Supabase Auth + profile trigger (auto-creates pending member profile).
+- Dual check: Supabase email_confirmed_at + app-level profile.status === 'approved'.
+- Admin "Confirm Email" button as family-friendly bypass.
+- Session refresh in middleware (basic).
+
+**Data Integrity & Audit**:
+- Zod schemas on all form submissions.
+- Full audit_logs on every admin/privileged mutation.
+- Soft deletes (status = 'inactive').
+- lastWifeId logic duplicated intentionally in direct create path and approve path for consistency.
+- UNIQUE constraints and CHECKs in schema.
+
+**Other**:
+- No client-side database writes.
+- Server components for data fetching (RLS/views enforced at query time).
+- Conditional UI everywhere based on real profile state.
+
+**Gaps in current guards** (see recommendations below): No rate limiting, no consent capture, no read-audit, minimal middleware protection, no automated tests.
+
+---
+
+## 3. What Should Be in the App — Current + Missing Items
+(Recommendations for a production-grade, scalable family lineage platform for 3000+ members across global households. Prioritized for trust, elder usability, lineage clarity, legal compliance, and performance.)
+
+### A. Current Strengths (Keep & Polish)
+- Household-centric model matching printed books.
+- Rich per-person details (every individual has full additional data).
+- Approval workflow + complete audit (never direct member edits).
+- Multi-layer privacy (views + RLS + UI).
+- Automatic mother-link creation for complex families via input order.
+- Family Links column + relationship graph surfacing.
+- Unified header, respectful tone, good form UX for the repeater.
+
+### B. Missing / Must-Add for True Lineage at 3K+ Scale
+**Lineage & Genealogy Features**:
+- Ancestor / descendant / cousin / relationship-path calculators and visualizations (recursive CTEs or graph traversal on server).
+- Proper interactive family tree (not just household cards + client filter) — expandable generations, timelines, radial or list-based ancestor views.
+- Advanced "find my relatives" search (e.g., "all living descendants of X in Canada").
+- Support for more real-world relationships (adoptions, multiple prior spouses, step-relations) with explicit UI.
+- Versioning + sources/citations on key facts (birth date, marriage, relationship claims).
+- GEDCOM / JSON / CSV export + import (with change_request approval queue) so families can use other tools (Gramps, etc.).
+- Diaspora / global views (safe aggregate maps or lists by country without leaking individuals).
+- Timeline of family events (births, marriages, passings, reunions) derived from persons + announcements + dates.
+
+**Scalability & Performance (Critical for 3000+)**:
+- Server-side pagination, server-side search (full-text), and limits on **every** list (directory, admin users/households/persons/requests, family tree fetch, dashboard).
+- Virtualized or paged rendering for large households in repeater and tree views.
+- Efficient queries for celebrations, recent updates, and graph traversals (no full-table scans of all persons/households).
+- Proper indexing (trigram/full-text for names, materialized views for common lineage queries).
+- Caching strategies and query performance monitoring.
+
+**Onboarding & Growth for Large Dispersed Family**:
+- Invitation system with secure tokens (admin can invite specific people/households; pre-approves or pre-links).
+- Bulk import tools (CSV/spreadsheet of households/persons with approval queue).
+- Self-service "claim my profile" or household association for existing members.
+
+**Data Integrity & Stewardship**:
+- Duplicate detection (on submit and in admin) with merge tools.
+- Relationship consistency checker / repair tools (detect impossible graphs, orphans).
+- Data quality dashboard for admins (incomplete records, missing relationships, unverified households).
+- "Add Missed Family Members" should fully support lastWife logic in all paths.
+
+**Engagement & Communication**:
+- Notifications (in-app + email on request status changes, new announcements, upcoming family events for your branch).
+- Personalized "My Lineage" dashboard section (my ancestors, my descendants, events relevant to me).
+- Comments or private notes on records (with proper visibility).
+
+**Print, Export & Portability**:
+- High-quality, well-formatted "Family Directory Book" PDF generation (sectioned by household, with indexes, photos placeholders).
+- Full personal data export for approved members (GDPR-style portability).
+- Public "directory book" snapshot export option for printing physical copies.
+
+### C. Legal, Privacy, Compliance & Ethical Guardrails (Even for Closed Family Use)
+- Consent language + checkbox on register; permanent links to Privacy Policy, Terms of Use, and Family Charter.
+- Self-service "Export My Data" (structured JSON including relationships).
+- Admin tools for "Right to be Forgotten" / anonymization that preserve lineage integrity (replace name with "Private Family Member [ID]", keep graph links, full audit trail).
+- Minor/child data protections (age calculation or explicit minor flag, restricted visibility, guardian consent notes).
+- Read-access audit logging (or at minimum Supabase audit for sensitive views).
+- Data retention policy (e.g., full details retained 100+ years after death for historical/lineage value; clear rules documented).
+- International compliance notes (GDPR, CCPA, etc. for members in different jurisdictions).
+- Rate limiting and abuse protection on public auth/submit endpoints.
+- Clear "family data is sacred" messaging and admin stewardship guidelines.
+
+### D. UX, Accessibility, Design & Multi-Generational Polish
+- In-app contextual help, tooltips, and guided explanations (especially on the repeater: "Add wives before their children so the system can correctly record mother links").
+- Full alignment with design.md vision (warm parchment/saffron "Vamsam" palette, Source Serif 4 + Atkinson Hyperlegible, organic card-on-card, soft tactility) — current implementation has drifted to cooler greens.
+- Mobile excellence (large comfortable targets, simplified flows, bottom nav or better menu for elders).
+- Accessibility (WCAG 2.2 AA+): ARIA, keyboard navigation, screen-reader support for tables/trees, high-contrast mode, adjustable text size.
+- i18n / localization support (at minimum English + primary family languages).
+- Consistent loading skeletons, error boundaries, empty states, and toasts across the entire app.
+- Refined admin experience as calm "Archivist Workspace" (not corporate dashboard) — see separate redesign notes in prior discussions.
+- Better handling of long content, international names, and edge-case family structures in UI.
+
+### E. Ops, Security, Testing & Technical Guardrails
+- Comprehensive automated test suite (unit tests for lineage logic, actions, validators; integration tests for approval flows and complex family creation; e2e for critical user journeys).
+- Error boundaries + global error.tsx + loading states everywhere.
+- Monitoring, logging, and performance observability.
+- Backup/restore procedures documented and periodically tested (beyond Supabase defaults).
+- Stronger auth defaults (better password policy, optional 2FA guidance).
+- CI pipeline that runs build + lint + tests.
+- Regenerated and maintained database.types.ts from Supabase.
+- Transaction safety improvements for multi-table lineage creation/approval (atomicity).
+- Clear environment variable and secret management guidance.
+
+### F. Product & Documentation
+- In-app glossary of relationship terms and "how to read the family links".
+- Updated user handbook (README + in-app help) that covers new lineage features.
+- Admin stewardship playbook / checklist.
+- Privacy-safe aggregate analytics ("X living members across Y countries", "Z new households this year").
+
+**Prioritization Guidance** (from analysis):
+- **Critical (trust + scale)**: Pagination + full-text search everywhere, lineage path calculators + better tree viz, legal surfaces (consent/policy/export/anonymize), invitation system, tests.
+- **High Impact**: Notifications, data quality tools, help/tooltips on relationships, admin workspace redesign, PDF book export.
+- **Foundation**: Align UI fully to design.md warm heritage aesthetic.
+
+---
+
+## 4. The Generated Master Prompt (Ready to Copy & Use)
+
+```
+You are a senior Product Manager + Genealogy Domain Expert + Privacy/Compliance Specialist + Senior UX Designer for large-scale, respectful, multi-generational family lineage platforms (think private extended-family archives with 1000s of members across countries, replacing printed books while enabling deep lineage research).
+
+The current app is the Digital Family Directory (Next.js 16 App Router + Supabase, detailed in the attached projectsummary.txt, README.md as full handbook, design.md for "Vamsam / Living History / Organic Tactility" aesthetic, and the exhaustive AgentQA.txt report which inventories 100% of current routes, every button/link/form/action/guard, the exact lastWifeId mother-linking lineage logic, privacy model, and all gaps).
+
+Context for this family: One extended family with 3000+ members in dozens/hundreds of households, roots across multiple countries/continents, many elders + global diaspora, strong cultural traditions, need for trust/accuracy/approval, and long-term archival value. The product must feel like a living digital heirloom/ledger, not SaaS.
+
+Task:
+1. Produce an exhaustive "Current State Features & Guard Rails" list (categorized by role/experience + technical).
+2. Produce a complete gap analysis vs best-in-class genealogy/family archive products + legal/product/app-design best practices (scalability for 3K+, true lineage tools, privacy/compliance even in closed family use, UX for elders/global, data integrity, engagement, ops).
+3. Deliver a prioritized, categorized backlog of "Features & Functionalities That Should Be in the App" (must-have for trust/scale/lineage clarity vs high-impact vs nice-to-have). For each item include: description, rationale (impact on elders, diaspora, lineage accuracy, legal risk, stewardship), rough effort, dependencies, and suggested UI/data model notes.
+4. Detail all additional guard rails needed (technical, legal/consent, UX, data integrity, lineage consistency, privacy, security, compliance).
+5. Specifically address lineage at scale: data model extensions, query strategies (recursive/graph), visualization patterns, input/approval UX for complex families, verification/consistency tools, export/import (GEDCOM etc.), while preserving the existing household + rich persons + household_members + relationships approach and lastWife mother-link logic.
+6. Address legal/privacy realities for personal data of living + deceased family members (consent, subject rights, minors, erasure vs lineage preservation, retention, international transfers, read audit, etc.) and recommend exact surface-level + backend changes.
+7. Recommend updates to the design system (aligning to design.md), information architecture, admin "Archivist Workspace", mobile/elder/global considerations, and documentation/handbook.
+8. Include risks, trade-offs, and a phased rollout plan (quick wins first, then foundational lineage + scale + compliance).
+
+Output in clear, scannable sections with tables where helpful. Base everything strictly on the current verified implementation (do not assume features that don't exist). Make recommendations practical for a real single-family production deployment on Supabase/Next.js while elevating it to a trusted, scalable, lineage-first final product.
+```
+
+**How to use the prompt**: Paste the full prompt + contents (or key excerpts + file references) of projectsummary.txt, README.md, design.md, and AgentQA.txt into a capable LLM or another agent session.
+
+---
+
+## 5. References & Next Steps
+- **AgentQA.txt** — The complete, exhaustive testing report (every single link, button, form, action, guard, lineage flow, edge case, and scalability issue analyzed with 120+ item matrix).
+- **projectsummary.txt** — High-level current state summary.
+- **README.md** — Full user handbook (data model explanation, relationship logic, workflows).
+- **design.md** — Aspirational "Vamsam" warm heritage design system.
+
+This file (AgentRecommendations.txt) is the consolidated "what the product needs to be excellent for a 3000+ member global family lineage archive."
+
+When you are ready, provide direction (e.g., "Prioritize lineage tools + pagination + legal surfaces first", "Start implementing the master prompt plan", "Focus redesign on admin + landing as discussed earlier", or answers to any open questions), and we can move to detailed planning or (only with your explicit approval) implementation.
+
+File created: /Users/manthangandhi/digital-family-directory/AgentRecommendations.txt
+(Companion to AgentQA.txt — no app code was altered.)
