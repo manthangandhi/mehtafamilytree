@@ -36,7 +36,7 @@ export default async function MyRequestsPage() {
             </div>
 
             {r.status === 'rejected' && r.rejection_reason && (
-              <div className="mt-3 rounded bg-red-50 p-3 text-sm text-red-800">
+              <div className="mt-3 rounded bg-accent/10 p-3 text-sm text-accent">
                 <span className="font-medium">Rejection reason:</span> {r.rejection_reason}
               </div>
             )}

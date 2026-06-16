@@ -13,8 +13,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div>
         {label && <label htmlFor={id} className="label">{label}</label>}
-        <input id={id} ref={ref} className={`input ${error ? 'border-red-400 focus:ring-red-400/40 focus:border-red-500' : ''} ${className}`} {...props} />
-        {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+        <input id={id} ref={ref} className={`input ${error ? 'border-accent focus:ring-accent/40 focus:border-accent' : ''} ${className}`} {...props} />
+        {error && <p className="mt-1 text-xs text-accent">{error}</p>}
       </div>
     );
   }

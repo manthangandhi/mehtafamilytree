@@ -85,9 +85,9 @@ export function DirectorySearch({ initialFilters = {} }: Props) {
   const hasActiveFilters = Object.values(filters).some(Boolean);
 
   return (
-    <form onSubmit={submit} className="bg-surface card p-5 animate-fade-in border border-border shadow-md">
+    <form onSubmit={submit} className="bg-surface card p-5 animate-fade-in border border-border shadow-md rounded-3xl">
       <div className="mb-4 flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm font-medium text-stone-700">
+        <div className="flex items-center gap-2 text-sm font-medium text-foreground">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
             <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
           </svg>
@@ -115,7 +115,7 @@ export function DirectorySearch({ initialFilters = {} }: Props) {
       <button
         type="button"
         onClick={() => setShowAdvanced(!showAdvanced)}
-        className="mt-3 text-xs text-primary hover:text-emerald-700 font-medium flex items-center gap-1 transition-colors"
+        className="mt-3 text-xs text-primary hover:text-primary font-medium flex items-center gap-1 transition-colors"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>
@@ -127,28 +127,28 @@ export function DirectorySearch({ initialFilters = {} }: Props) {
       {showAdvanced && (
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 animate-fade-in border-t border-border/50 pt-4">
           <div>
-            <div className="text-xs text-muted mb-1">City</div>
+            <div className="text-sm text-foreground font-medium mb-1">City</div>
             <Input value={filters.city} onChange={(e) => handleChange('city', e.target.value)} placeholder="City" />
           </div>
           <div>
-            <div className="text-xs text-muted mb-1">State</div>
+            <div className="text-sm text-foreground font-medium mb-1">State</div>
             <Input value={filters.state} onChange={(e) => handleChange('state', e.target.value)} placeholder="State" />
           </div>
           <div>
-            <div className="text-xs text-muted mb-1">Native place</div>
+            <div className="text-sm text-foreground font-medium mb-1">Native place</div>
             <Input value={filters.native_place} onChange={(e) => handleChange('native_place', e.target.value)} placeholder="Native place" />
           </div>
 
           <div>
-            <div className="text-xs text-muted mb-1">Relationship to head</div>
+            <div className="text-sm text-foreground font-medium mb-1">Relationship to head</div>
             <Select value={filters.relationship} onChange={(e) => handleChange('relationship', e.target.value)} options={relationshipOptions} />
           </div>
           <div>
-            <div className="text-xs text-muted mb-1">Marital status</div>
+            <div className="text-sm text-foreground font-medium mb-1">Marital status</div>
             <Input value={filters.marital_status} onChange={(e) => handleChange('marital_status', e.target.value)} placeholder="married / single" />
           </div>
           <div>
-            <div className="text-xs text-muted mb-1">Alive / Deceased</div>
+            <div className="text-sm text-foreground font-medium mb-1">Alive / Deceased</div>
             <Select
               value={filters.is_deceased}
               onChange={(e) => handleChange('is_deceased', e.target.value)}
@@ -169,7 +169,7 @@ export function DirectorySearch({ initialFilters = {} }: Props) {
         )}
       </div>
 
-      <p className="mt-3 text-[11px] text-muted">
+      <p className="mt-3 text-xs text-foreground font-medium">
         Privacy protected — full contact details are shown only to approved family members.
       </p>
     </form>

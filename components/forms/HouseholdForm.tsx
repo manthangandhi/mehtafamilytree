@@ -60,11 +60,19 @@ export function HouseholdForm({
           <Input label="State" value={household.state || ''} onChange={(e) => updateH('state', e.target.value)} />
           <Input label="Country" value={household.country || 'India'} onChange={(e) => updateH('country', e.target.value)} />
 
+          {/* Contact grouping for better UX */}
+          <div className="md:col-span-2 mt-2">
+            <div className="text-xs text-muted mb-2 font-medium">Contact Details</div>
+          </div>
           <Input label="Phone (Landline)" value={household.phone_number || ''} onChange={(e) => updateH('phone_number', e.target.value)} />
           <Input label="Mobile" value={household.mobile_number || ''} onChange={(e) => updateH('mobile_number', e.target.value)} />
           <Input label="WhatsApp" value={household.whatsapp_number || ''} onChange={(e) => updateH('whatsapp_number', e.target.value)} />
           <Input label="Email" type="email" value={household.email || ''} onChange={(e) => updateH('email', e.target.value)} />
 
+          {/* Addresses grouping */}
+          <div className="md:col-span-2 mt-2">
+            <div className="text-xs text-muted mb-2 font-medium">Addresses</div>
+          </div>
           <div className="md:col-span-2">
             <Textarea label="Residence Address" value={household.residence_address || ''} onChange={(e) => updateH('residence_address', e.target.value)} />
           </div>

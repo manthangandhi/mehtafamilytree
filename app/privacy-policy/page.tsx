@@ -3,7 +3,7 @@ export default function PrivacyPolicyPage() {
     <div className="max-w-4xl mx-auto px-6 py-12 animate-fade-in">
       <h1 className="font-serif text-4xl font-bold text-foreground mb-8">Privacy Policy</h1>
       
-      <div className="prose prose-stone max-w-none">
+      <div className="prose-heritage max-w-none">
         <p className="text-lg text-muted mb-8">
           Welcome to Mehta Kutumb. We take your privacy and the security of your family's data extremely seriously. This policy outlines how we protect your information.
         </p>

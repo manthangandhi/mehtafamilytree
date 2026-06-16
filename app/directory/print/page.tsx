@@ -33,7 +33,7 @@ export default async function PrintDirectoryPage() {
     .order('created_at', { ascending: true });
 
   return (
-    <div className="min-h-screen bg-surface text-black p-4 sm:p-8 font-serif">
+    <div className="min-h-screen bg-surface text-foreground p-4 sm:p-8 font-serif">
       
       {/* Non-printable header for desktop viewing */}
       <div className="print:hidden flex items-center justify-between mb-8 max-w-5xl mx-auto bg-surface-hover p-4 rounded-xl border border-border">
@@ -100,15 +100,15 @@ export default async function PrintDirectoryPage() {
         </div>
 
         {/* Culture & History Section */}
-        {culturalPages && culturalPages.length > 0 && (
+        {culturalPages && (culturalPages as any[]).length > 0 && (
           <div className="page-break pb-12 print:pb-0">
             <h1 className="text-4xl font-bold mb-12 uppercase tracking-widest border-b-2 border-primary inline-block pb-2">Family History & Culture</h1>
             <div className="space-y-16">
-              {culturalPages.map(page => (
+              {(culturalPages as any[]).map((page: any) => (
                 <div key={page.id} className="avoid-break mb-12">
                   <h2 className="text-3xl font-bold mb-2 text-primary">{page.title}</h2>
                   <div className="text-xs uppercase tracking-widest text-muted mb-6 font-sans">{page.category} • {page.language}</div>
-                  <div className="prose prose-stone max-w-none text-justify leading-relaxed" dangerouslySetInnerHTML={{ __html: page.content || '' }} />
+                  <div className="prose-heritage max-w-none text-justify leading-relaxed" dangerouslySetInnerHTML={{ __html: page.content || '' }} />
                 </div>
               ))}
             </div>
@@ -121,13 +121,13 @@ export default async function PrintDirectoryPage() {
           
           <div className="space-y-12">
             {(households as any[])?.map(household => (
-              <div key={household.id} className="avoid-break bg-surface rounded-2xl border border-border p-8 print:p-6 print:border-2 print:border-gray-200">
+              <div key={household.id} className="avoid-break bg-surface rounded-2xl border border-border p-8 print:p-6 print:border-2 print:border-border">
                 <div className="border-b-2 border-primary/20 pb-4 mb-6 flex justify-between items-end">
                   <div>
                     <h2 className="text-2xl font-bold text-primary">{household.primary_member_name} Family</h2>
-                    {household.household_code && <span className="text-xs font-mono font-bold tracking-widest text-muted uppercase mt-1 block">Household {household.household_code}</span>}
+                    {household.household_code && <span className="text-sm font-mono font-bold tracking-widest text-muted uppercase mt-1 block">Household {household.household_code}</span>}
                   </div>
-                  <div className="text-right text-sm text-stone-600 font-sans">
+                  <div className="text-right text-sm text-muted font-sans">
                     {household.residence_address && <div>{household.residence_address}</div>}
                     <div>{household.city}, {household.state} {household.country}</div>
                     {household.mobile_number && <div>{household.mobile_number}</div>}
@@ -139,7 +139,7 @@ export default async function PrintDirectoryPage() {
                     const person = hm.persons;
                     return (
                       <div key={hm.id} className="flex gap-4 items-start avoid-break">
-                        <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 border border-primary/20 overflow-hidden font-bold text-lg print:border-gray-300 print:text-black">
+                        <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 border border-primary/20 overflow-hidden font-bold text-lg print:border-border print:text-foreground">
                            {person.image_url ? (
                              <img src={person.image_url} alt={person.full_name} className="w-full h-full object-cover grayscale" />
                            ) : (
@@ -148,14 +148,14 @@ export default async function PrintDirectoryPage() {
                         </div>
                         <div className="font-sans">
                           <div className="font-bold text-foreground text-base">{person.full_name}</div>
-                          <div className="text-xs font-semibold text-primary uppercase tracking-wider mb-1">{hm.relationship_to_head}</div>
+                          <div className="text-sm font-semibold text-primary uppercase tracking-wider mb-1">{hm.relationship_to_head}</div>
                           
-                          <div className="text-sm text-stone-600 space-y-0.5 mt-2">
+                          <div className="text-[15px] text-muted space-y-0.5 mt-2">
                             {person.date_of_birth && <div><span className="text-muted mr-2">DOB:</span>{person.date_of_birth}</div>}
                             {person.mobile_number && <div><span className="text-muted mr-2">Mob:</span>{person.mobile_number}</div>}
                             {person.email && <div><span className="text-muted mr-2">Email:</span>{person.email}</div>}
                             {person.blood_group && <div><span className="text-muted mr-2">Blood:</span>{person.blood_group}</div>}
-                            {person.is_deceased && <div className="text-red-800 font-semibold mt-1">Deceased</div>}
+                            {person.is_deceased && <div className="text-accent font-semibold mt-1">Deceased</div>}
                           </div>
                         </div>
                       </div>

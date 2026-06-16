@@ -38,13 +38,13 @@ export default async function AdminOverview() {
         
         <Link href="/admin/requests" className="bg-surface rounded-[2rem] border border-border/50 p-6 shadow-[0_10px_40px_-15px_rgba(141,79,17,0.1)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
           <div className="flex items-start justify-between mb-4">
-            <div className="p-3 bg-emerald-600/10 rounded-xl text-emerald-700">
+            <div className="p-3 bg-primary/10 rounded-xl text-primary">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="m9 15 3 3 3-3"/></svg>
             </div>
             {pendingRequests ? (
               <span className="flex h-3 w-3 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-600 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-600"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary/75 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
               </span>
             ) : null}
           </div>
@@ -78,7 +78,7 @@ export default async function AdminOverview() {
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
             New Cultural Page
           </Link>
-          <Link href="/admin/announcements/new" className="bg-surface border-2 border-secondary text-emerald-700 hover:bg-emerald-600/5 transition-all transform hover:-translate-y-px inline-flex items-center justify-center px-6 py-4 rounded-2xl font-sans text-sm font-semibold tracking-wide whitespace-nowrap">
+          <Link href="/admin/announcements/new" className="bg-surface border-2 border-border text-primary hover:bg-primary/5 transition-all transform hover:-translate-y-px inline-flex items-center justify-center px-6 py-4 rounded-2xl font-sans text-sm font-semibold tracking-wide whitespace-nowrap">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
             Post Announcement
           </Link>

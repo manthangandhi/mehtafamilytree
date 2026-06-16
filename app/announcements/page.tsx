@@ -23,7 +23,7 @@ export default async function AnnouncementsPage() {
     .order('created_at', { ascending: false });
 
   return (
-    <div className="min-h-screen bg-[#fafaf9]">
+    <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-4xl px-6 py-10">
         <div className="mb-12 animate-fade-in flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -44,24 +44,24 @@ export default async function AnnouncementsPage() {
               <div key={ann.id} className={`bg-surface rounded-3xl p-6 md:p-8 animate-fade-in border border-border/50 ${i === 0 ? 'delay-1' : i === 1 ? 'delay-2' : 'delay-3'}`}>
                 <div className="flex flex-wrap items-center gap-3 mb-4">
                   <span className={`px-4 py-1.5 rounded-full font-bold uppercase tracking-wider
-                    ${ann.event_type === 'birth' ? 'bg-[#ffebf0] text-[#c2185b]' :
-                      ann.event_type === 'marriage' ? 'bg-[#f3e5f5] text-[#7b1fa2]' :
-                      ann.event_type === 'reunion' ? 'bg-[#e8f5e9] text-[#388e3c]' :
-                      ann.event_type === 'passing' ? 'bg-outline-variant text-foreground' :
-                      'bg-amber-50 text-amber-800'
+                    ${ann.event_type === 'birth' ? 'bg-accent/10 text-primary' :
+                      ann.event_type === 'marriage' ? 'bg-primary/5 text-primary' :
+                      ann.event_type === 'reunion' ? 'bg-success/10 text-success' :
+                      ann.event_type === 'passing' ? 'bg-surface-hover text-muted' :
+                      'bg-accent/10 text-accent'
                     }`}>
                     {ann.event_type}
                   </span>
-                  <span className="text-muted">
+                  <span className="text-sm text-muted">
                     {format(new Date(ann.created_at), 'MMMM d, yyyy')}
                   </span>
-                  <span className="text-muted ml-auto flex items-center gap-1.5">
+                  <span className="text-sm text-muted ml-auto flex items-center gap-1.5">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                     {ann.profiles?.full_name || 'Admin'}
                   </span>
                 </div>
                 <h2 className="font-serif text-foreground mb-3">{ann.title}</h2>
-                <div className="prose prose-zinc max-w-none">
+                <div className="prose-heritage max-w-none">
                   <p className="whitespace-pre-wrap text-muted leading-relaxed">{ann.content}</p>
                 </div>
               </div>

@@ -60,7 +60,7 @@ export default function EditCulturalPage({ params }: { params: Promise<{ id: str
         </p>
         <div className="flex gap-3">
           <Button type="submit" disabled={loading}>Save</Button>
-          <Button type="button" variant="secondary" onClick={del} className="text-red-600 hover:text-red-700 hover:bg-red-50">Delete</Button>
+          <Button type="button" variant="secondary" onClick={del} className="text-accent hover:text-primary hover:bg-accent/10">Delete</Button>
         </div>
       </form>
     </div>

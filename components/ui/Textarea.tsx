@@ -16,10 +16,10 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         <textarea
           id={id}
           ref={ref}
-          className={`input min-h-[96px] resize-y ${error ? 'border-red-400' : ''} ${className}`}
+          className={`input min-h-[96px] resize-y ${error ? 'border-accent' : ''} ${className}`}
           {...props}
         />
-        {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+        {error && <p className="mt-1 text-xs text-accent">{error}</p>}
       </div>
     );
   }

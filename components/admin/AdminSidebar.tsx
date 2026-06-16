@@ -2,16 +2,17 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { LayoutDashboard, Users, Home, User, FileText, BookOpen, Megaphone, ListChecks } from 'lucide-react';
 
 const links = [
-  { href: '/admin', label: 'Overview' },
-  { href: '/admin/users', label: 'Users' },
-  { href: '/admin/households', label: 'Households' },
-  { href: '/admin/persons', label: 'Persons' },
-  { href: '/admin/requests', label: 'Change Requests' },
-  { href: '/admin/culture', label: 'Cultural Pages' },
-  { href: '/admin/announcements', label: 'Announcements' },
-  { href: '/admin/audit-logs', label: 'Audit Logs' },
+  { href: '/admin', label: 'Overview', icon: LayoutDashboard },
+  { href: '/admin/users', label: 'Users', icon: Users },
+  { href: '/admin/households', label: 'Households', icon: Home },
+  { href: '/admin/persons', label: 'Persons', icon: User },
+  { href: '/admin/requests', label: 'Change Requests', icon: FileText },
+  { href: '/admin/culture', label: 'Cultural Pages', icon: BookOpen },
+  { href: '/admin/announcements', label: 'Announcements', icon: Megaphone },
+  { href: '/admin/audit-logs', label: 'Audit Logs', icon: ListChecks },
 ];
 
 export function AdminSidebar() {
@@ -29,12 +30,13 @@ export function AdminSidebar() {
             <Link
               key={l.href}
               href={l.href}
-              className={`block rounded-xl px-3 py-2 transition-all duration-200 ${
+              className={`flex items-center gap-2 rounded-xl px-3 py-2 transition-all duration-200 ${
                 active 
                   ? 'bg-primary/10 text-primary shadow-sm' 
                   : 'text-muted hover:bg-surface/80 hover:text-foreground'
               }`}
             >
+              <l.icon size={16} className="opacity-60" />
               {l.label}
             </Link>
           );

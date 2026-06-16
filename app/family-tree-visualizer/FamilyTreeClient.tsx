@@ -17,6 +17,7 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { createClient } from "../../lib/supabase/client";
+import Image from "next/image";
 
 const CustomNode = ({ data }: { data: any }) => {
   return (
@@ -30,9 +31,9 @@ const CustomNode = ({ data }: { data: any }) => {
         {/* Avatar with elegant fallback to heritage tree image */}
         <div className="w-12 h-12 rounded-full bg-surface-hover border border-border flex items-center justify-center text-primary font-serif font-bold text-xl shadow-sm overflow-hidden flex-shrink-0 ring-1 ring-inset ring-white/60">
           {data.avatar_url ? (
-            <img src={data.avatar_url} alt={data.label} className="w-full h-full object-cover" />
+            <img src={data.avatar_url} alt={data.label} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = '/images/hero-tree.png'; }} />
           ) : (
-            <img src="/images/hero-tree.png" alt="Family tree" className="w-8 h-8 object-contain opacity-70" />
+            <Image src="/images/hero-tree.png" alt="Family tree" width={32} height={32} className="w-8 h-8 object-contain opacity-70" />
           )}
         </div>
         
@@ -74,9 +75,9 @@ export default function FamilyTreeClient() {
         const { data: householdsData, error: householdsError } = await supabase.from('households').select('*');
         const { data: relationsData, error: relationsError } = await supabase.from('relationships').select('*');
         
-        let persons = personsData || [];
-        let households = householdsData || [];
-        let relations = relationsData || [];
+        let persons: any[] = personsData || [];
+        let households: any[] = householdsData || [];
+        let relations: any[] = relationsData || [];
 
         // Fallback to mock data ONLY if the database is literally completely empty
         if ((personsError || !persons.length) && !relations.length) {
@@ -195,7 +196,7 @@ export default function FamilyTreeClient() {
                   target: spouseId.toString(),
                   type: 'straight',
                   animated: false,
-                  style: { stroke: '#d4af37', strokeWidth: 2, strokeDasharray: '5,5', opacity: 0.7 },
+                  style: { stroke: '#C8A97E', strokeWidth: 2, strokeDasharray: '5,5', opacity: 0.7 },
                 });
               }
             }
@@ -258,9 +259,9 @@ export default function FamilyTreeClient() {
 
   if (loading) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-[#0a0a0a]">
+      <div className="w-full h-full flex items-center justify-center bg-foreground/95">
         <div className="flex flex-col items-center gap-3">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#d4af37]"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent"></div>
           <p className="text-white/60 text-sm">Loading our family connections across households...</p>
         </div>
       </div>
@@ -273,8 +274,8 @@ export default function FamilyTreeClient() {
       <svg style={{ position: 'absolute', width: 0, height: 0 }}>
         <defs>
           <linearGradient id="edge-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#d4af37" />
-            <stop offset="100%" stopColor="#1e3a8a" />
+            <stop offset="0%" stopColor="#C8A97E" />
+            <stop offset="100%" stopColor="#0B2E24" />
           </linearGradient>
         </defs>
       </svg>
@@ -289,13 +290,13 @@ export default function FamilyTreeClient() {
         fitView
         className="bg-surface"
       >
-        <Background color="#e5e5e5" gap={16} />
+        <Background color="#e6dfd4" gap={16} />
         <MiniMap 
           nodeColor={() => '#0B2E24'}
-          maskColor="rgba(250, 250, 250, 0.8)"
-          style={{ backgroundColor: '#fff', border: '1px solid #e5e5e5' }}
+          maskColor="rgba(255, 252, 247, 0.8)"
+          style={{ backgroundColor: '#fffcf7', border: '1px solid #e6dfd4' }}
         />
-        <Controls style={{ backgroundColor: '#fff', fill: '#0B2E24', border: '1px solid #e5e5e5' }} />
+        <Controls style={{ backgroundColor: '#fffcf7', fill: '#0B2E24', border: '1px solid #e6dfd4' }} />
       </ReactFlow>
     </>
   );

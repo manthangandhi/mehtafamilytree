@@ -20,7 +20,7 @@ export default function FamilyTreeClient({ treeData }: FamilyTreeClientProps) {
   });
 
   return (
-    <div className="flex flex-col min-h-screen pt-10">
+    <div className="flex flex-col min-h-screen bg-background pt-10">
       <div className="mb-12">
         <h1 className="font-serif text-[36px] leading-[44px] font-semibold text-foreground mb-4">Mehta Kutumb Lineage</h1>
         <p className="text-muted max-w-2xl text-lg">

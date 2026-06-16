@@ -84,7 +84,7 @@ function LoginForm() {
       />
 
       {error && (
-        <div className="rounded-lg bg-red-50 border border-red-100 p-3 text-sm text-red-700">
+        <div className="rounded-lg bg-accent/10 border border-accent/20 p-3 text-sm text-accent">
           {error}
         </div>
       )}
@@ -98,7 +98,7 @@ function LoginForm() {
           type="button"
           onClick={handleResendConfirmation}
           disabled={resending || !email}
-          className="text-xs text-muted hover:text-primary underline underline-offset-2 disabled:opacity-50 transition-colors"
+          className="text-sm text-foreground font-medium hover:text-primary underline underline-offset-2 disabled:opacity-50 transition-colors"
         >
           {resending ? 'Resending...' : "Didn't receive confirmation email? Resend it"}
         </button>
@@ -109,10 +109,10 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-[80vh] items-center justify-center vamsam-gradient px-4">
+    <div className="flex min-h-[80vh] items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm animate-fade-in">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-50 to-teal-50 border border-border/50">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-background to-surface border border-border/50">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
               <path d="M17 10.5V6a1 1 0 0 0-1-1h-2.5" />
               <path d="M11 6V3a1 1 0 0 0-1-1H7.5" />
@@ -133,7 +133,7 @@ export default function LoginPage() {
 
         <p className="mt-6 text-center text-sm text-muted">
           Don't have an account?{' '}
-          <Link href="/register" className="font-medium text-primary hover:text-emerald-700 underline underline-offset-2">Register here</Link>
+          <Link href="/register" className="font-medium text-primary hover:text-primary underline underline-offset-2">Register here</Link>
         </p>
       </div>
     </div>

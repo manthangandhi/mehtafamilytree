@@ -60,11 +60,11 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-[80vh] items-center justify-center vamsam-gradient px-4 py-10">
+    <div className="flex min-h-[80vh] items-center justify-center bg-background px-4 py-10">
       <div className="w-full max-w-sm animate-fade-in">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-50 to-teal-50 border border-border/50">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-teal-600">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-background to-surface border border-border/50">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
               <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
               <circle cx="9" cy="7" r="4" />
               <line x1="19" x2="19" y1="8" y2="14" />
@@ -105,7 +105,7 @@ export default function RegisterPage() {
           />
 
           {error && (
-            <div className="rounded-lg bg-red-50 border border-red-100 p-3 text-sm text-red-700">
+            <div className="rounded-lg bg-accent/10 border border-accent/20 p-3 text-sm text-accent">
               {error}
             </div>
           )}
@@ -114,13 +114,13 @@ export default function RegisterPage() {
             {loading ? 'Creating account...' : 'Create Account'}
           </Button>
 
-          <p className="text-center text-xs text-muted">
+          <p className="text-center text-sm text-foreground font-medium">
             After registration your account will be in \u201cpending\u201d status until an admin approves you.
           </p>
         </form>
 
         <p className="mt-6 text-center text-sm text-muted">
-          Already have an account? <Link href="/login" className="font-medium text-primary hover:text-emerald-700 underline underline-offset-2">Sign in</Link>
+          Already have an account? <Link href="/login" className="font-medium text-primary hover:text-primary underline underline-offset-2">Sign in</Link>
         </p>
       </div>
     </div>

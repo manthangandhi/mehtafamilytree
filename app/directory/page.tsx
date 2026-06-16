@@ -68,7 +68,7 @@ export default async function DirectoryPage({
   const totalResults = (households?.length || 0) + (persons?.length || 0);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
 
       <div className="mx-auto max-w-7xl px-6 py-12">
         <div className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-6">
@@ -102,12 +102,12 @@ export default async function DirectoryPage({
         {/* Results count */}
         {(params.q || params.city || params.state || params.native_place) && (
           <div className="mt-4 text-sm text-muted animate-fade-in">
-            Found <span className="font-medium text-stone-700">{totalResults}</span> results
+            Found <span className="font-medium text-foreground">{totalResults}</span> results
           </div>
         )}
 
         <div className="mt-8">
-          <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted flex items-center gap-2">
+          <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-foreground flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
             </svg>
@@ -116,7 +116,7 @@ export default async function DirectoryPage({
           {!households || households.length === 0 ? (
             <EmptyState title="No households found" description="Try broadening your search." />
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
               {households.map((h: any) => (
                 <HouseholdCard key={h.id} household={h} isApproved={isApproved} />
               ))}
@@ -125,43 +125,43 @@ export default async function DirectoryPage({
         </div>
 
         <div className="mt-10">
-          <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted flex items-center gap-2">
+          <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-foreground flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
             </svg>
             Matching Persons
           </h2>
           {!persons || persons.length === 0 ? (
-            <p className="text-sm text-muted italic">No matching persons in current search.</p>
+            <p className="text-base text-foreground font-medium">No matching persons in current search.</p>
           ) : (
-            <div className="bg-surface premium-card overflow-x-auto">
-              <table className="w-full text-left text-sm">
+            <div className="bg-surface premium-card overflow-x-auto rounded-3xl">
+              <table className="w-full text-left text-base leading-relaxed">
                 <thead>
                   <tr className="bg-surface-hover/50 border-b border-border/50">
-                    <th className="py-4 px-6 font-semibold text-muted tracking-wide">Name</th>
-                    <th className="py-4 px-6 font-semibold text-muted tracking-wide">Education</th>
-                    <th className="py-4 px-6 font-semibold text-muted tracking-wide">Marital Status</th>
-                    <th className="py-4 px-6 font-semibold text-muted tracking-wide">Status</th>
-                    {isApproved && <th className="py-4 px-6 font-semibold text-muted tracking-wide">Contact</th>}
+                    <th className="py-5 px-6 font-semibold text-foreground tracking-wide">Name</th>
+                    <th className="py-5 px-6 font-semibold text-foreground tracking-wide">Education</th>
+                    <th className="py-5 px-6 font-semibold text-foreground tracking-wide">Marital Status</th>
+                    <th className="py-5 px-6 font-semibold text-foreground tracking-wide">Status</th>
+                    {isApproved && <th className="py-5 px-6 font-semibold text-foreground tracking-wide">Contact</th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/30">
                   {persons.map((p: any) => (
                     <tr key={p.id} className="hover:bg-surface-hover/30 transition-colors">
-                      <td className="py-4 px-6 font-medium text-foreground whitespace-nowrap">{p.full_name}</td>
-                      <td className="py-4 px-6 text-muted max-w-[200px] truncate" title={p.education}>{p.education || '—'}</td>
-                      <td className="py-4 px-6 text-muted whitespace-nowrap">{p.marital_status || '—'}</td>
-                      <td className="py-4 px-6">
+                      <td className="py-5 px-6 font-medium text-foreground whitespace-nowrap">{p.full_name}</td>
+                      <td className="py-5 px-6 text-muted max-w-[200px] truncate" title={p.education}>{p.education || '—'}</td>
+                      <td className="py-5 px-6 text-muted whitespace-nowrap">{p.marital_status || '—'}</td>
+                      <td className="py-5 px-6">
                         {p.is_deceased ? (
-                          <span className="text-xs text-muted flex items-center gap-1">
-                            <span className="text-stone-300">†</span> Deceased
+                          <span className="text-sm text-muted flex items-center gap-1">
+                            <span className="text-muted">†</span> Deceased
                           </span>
                         ) : (
-                          <span className="text-xs text-emerald-700">Alive</span>
+                          <span className="text-sm text-primary">Alive</span>
                         )}
                       </td>
                       {isApproved && (
-                        <td className="py-4 px-6 text-xs text-muted whitespace-nowrap">
+                        <td className="py-5 px-6 text-sm text-muted whitespace-nowrap">
                           {p.mobile_number || p.whatsapp_number ? 'See household detail' : '—'}
                         </td>
                       )}
@@ -173,7 +173,7 @@ export default async function DirectoryPage({
           )}
         </div>
 
-        <p className="mt-8 text-center text-xs text-muted">
+        <p className="mt-8 text-center text-sm text-foreground font-medium">
           Privacy protected. Full addresses, phones and emails are only visible to approved family members.
         </p>
       </div>

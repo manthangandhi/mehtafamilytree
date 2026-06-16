@@ -37,7 +37,7 @@ export function AceternityButton({
       {...props}
     >
       <span className="absolute inset-0 w-full h-full bg-primary transition-all duration-300 group-hover:bg-opacity-80" />
-      <span className="absolute right-0 w-8 h-32 -mt-12 transition-all duration-1000 transform translate-x-12 bg-white opacity-20 rotate-12 group-hover:-translate-x-40 ease" />
+      <span className="absolute right-0 w-8 h-32 -mt-12 transition-all duration-1000 transform translate-x-12 bg-surface opacity-30 rotate-12 group-hover:-translate-x-40 ease" />
       <span className="relative">{children}</span>
     </button>
   );

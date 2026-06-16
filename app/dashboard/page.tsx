@@ -4,6 +4,7 @@ import { getCurrentUserProfile } from '@/lib/auth/getCurrentUserProfile';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { createClient } from '@/lib/supabase/server';
 import { format, isThisMonth, isThisWeek, parseISO, setYear, isAfter, isBefore, addDays } from 'date-fns';
+import Image from 'next/image';
 
 function getUpcomingCelebrations(persons: any[], households: any[]) {
   const today = new Date();
@@ -133,23 +134,23 @@ export default async function DashboardPage() {
 
         {/* Status Alerts */}
         {!emailConfirmed && (
-          <div className="card mb-8 border-red-200 bg-red-50 p-5 animate-fade-in">
+          <div className="card mb-8 border-accent/30 bg-accent/5 p-5 animate-fade-in">
             <div className="flex items-start gap-3">
               <div className="flex-shrink-0 mt-0.5">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-600">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent">
                   <circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>
                 </svg>
               </div>
               <div>
-                <div className="font-semibold text-red-900 text-[15px]">Confirm your email address</div>
-                <p className="mt-1 text-sm text-red-800">Check your inbox for the confirmation link to fully unlock your account.</p>
+                <div className="font-semibold text-accent text-[15px]">Confirm your email address</div>
+                <p className="mt-1 text-sm text-accent">Check your inbox for the confirmation link to fully unlock your account.</p>
               </div>
             </div>
           </div>
         )}
 
         {isPending && (
-          <div className="card mb-8 border-border bg-amber-50 p-5 animate-fade-in">
+          <div className="card mb-8 border-primary/30 bg-primary/5 p-5 animate-fade-in">
             <div className="flex items-start gap-3">
               <div className="flex-shrink-0 mt-0.5">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
@@ -157,8 +158,8 @@ export default async function DashboardPage() {
                 </svg>
               </div>
               <div>
-                <div className="font-semibold text-amber-900 text-[15px]">Account awaiting approval</div>
-                <p className="mt-1 text-sm text-emerald-700">An admin will review your account shortly. You can browse public records in the meantime.</p>
+                <div className="font-semibold text-primary text-[15px]">Account awaiting approval</div>
+                <p className="mt-1 text-sm text-primary">An admin will review your account shortly. You can browse public records in the meantime.</p>
               </div>
             </div>
           </div>
@@ -207,11 +208,13 @@ export default async function DashboardPage() {
                <div className="grid sm:grid-cols-2 gap-4">
                   <Link href="/directory" className="group p-4 rounded-xl bg-surface-hover border border-border/50 hover:border-primary/30 transition-all">
                     <div className="flex items-center gap-3 font-medium text-foreground group-hover:text-primary">
-                      <img src="/images/hero-tree.png" alt="" className="w-9 h-9 rounded-lg object-contain border border-border/50 p-0.5" />
+                      <div className="p-2 bg-surface border border-border/50 rounded-lg shadow-sm">
+                        <img src="/images/hero-tree.png" alt="" className="w-5 h-5 object-contain opacity-70" />
+                      </div>
                       Search Households
                     </div>
                   </Link>
-                  <Link href="/family-tree" className="group p-4 rounded-xl bg-surface-hover border border-border/50 hover:border-primary/30 transition-all">
+                  <Link href="/family-tree-visualizer" className="group p-4 rounded-xl bg-surface-hover border border-border/50 hover:border-primary/30 transition-all">
                     <div className="flex items-center gap-3 font-medium text-foreground group-hover:text-primary">
                       <div className="p-2 bg-surface border border-border/50 rounded-lg shadow-sm text-primary"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
                       Explore Family Tree
@@ -246,11 +249,11 @@ export default async function DashboardPage() {
                   <ul className="space-y-5">
                     {upcomingCelebrations.map((celeb, idx) => (
                       <li key={idx} className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-surface-hover border border-border flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+                        <div className="w-10 h-10 rounded-full bg-surface-hover border border-border flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
                           {celeb.avatarUrl ? (
-                            <img src={celeb.avatarUrl} alt={celeb.name} className="w-full h-full object-cover" />
+                            <img src={celeb.avatarUrl} alt={celeb.name} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = '/images/hero-tree.png'; }} />
                           ) : (
-                            <img src="/images/hero-tree.png" alt="Family symbol" className="w-full h-full object-cover opacity-70" />
+                            <Image src="/images/hero-tree.png" alt="Family symbol" width={40} height={40} className="w-full h-full object-cover opacity-70" />
                           )}
                         </div>
                         <div className="flex-1 min-w-0">

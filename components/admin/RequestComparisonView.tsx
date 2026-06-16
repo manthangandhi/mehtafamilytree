@@ -12,10 +12,10 @@ function DiffRow({ label, current, proposed }: { label: string; current: any; pr
   return (
     <div className="grid grid-cols-3 gap-3 border-b py-2 text-sm last:border-none">
       <div className="font-medium text-muted">{label}</div>
-      <div className={changed ? 'text-red-600 line-through' : 'text-muted'}>
+      <div className={changed ? 'text-accent line-through' : 'text-muted'}>
         {current === null || current === undefined || current === '' ? '—' : String(current)}
       </div>
-      <div className={changed ? 'font-medium text-emerald-700' : ''}>
+      <div className={changed ? 'font-medium text-primary' : ''}>
         {proposed === null || proposed === undefined || proposed === '' ? '—' : String(proposed)}
       </div>
     </div>

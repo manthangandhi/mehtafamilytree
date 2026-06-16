@@ -62,10 +62,10 @@ export default function MarkDeceasedPage() {
           onChange={(e) => setNotes(e.target.value)}
         />
 
-        <Button type="submit" variant="secondary" disabled={loading} className="text-red-600 border-red-200 hover:bg-red-50">
+        <Button type="submit" variant="secondary" disabled={loading} className="text-accent border-accent/30 hover:bg-accent/10">
           {loading ? 'Submitting...' : 'Submit Mark Deceased Request'}
         </Button>
-        <p className="text-xs text-muted">This request will be reviewed carefully by an administrator.</p>
+        <p className="text-sm text-foreground font-medium">This request will be reviewed carefully by an administrator.</p>
       </form>
     </div>
   );

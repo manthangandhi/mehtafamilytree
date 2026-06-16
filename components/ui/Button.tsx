@@ -18,12 +18,13 @@ export function Button({
   size = 'md',
   ...props
 }: ButtonProps) {
-  const base = 'inline-flex items-center justify-center rounded-sm font-sans font-semibold transition-colors focus:outline-none disabled:opacity-50 disabled:pointer-events-none';
+  // Use current .btn + theme classes from globals.css (surface, primary, accent). No undefined containers.
+  const base = 'btn';
   const variants = {
-    primary: 'bg-primary text-on-primary hover:bg-primary/90',
-    secondary: 'bg-secondary-container text-on-secondary-container hover:bg-secondary-container/90',
-    tertiary: 'bg-tertiary-container text-on-tertiary-container hover:bg-tertiary-container/90',
-    ghost: 'hover:bg-surface-hover text-primary',
+    primary: 'btn-primary',
+    secondary: 'btn-secondary',
+    tertiary: 'btn-secondary border border-border bg-surface hover:bg-surface-hover text-foreground',
+    ghost: 'btn-secondary bg-transparent border-transparent text-foreground hover:bg-surface-hover hover:text-primary',
   };
   const sizes = {
     sm: 'h-8 px-4 text-sm',

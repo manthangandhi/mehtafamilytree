@@ -1,10 +1,12 @@
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
+// Note: HouseholdCard import kept as-is (no changes to KPI/tagline section per instructions)
+import Image from 'next/image';
 
 export default async function Home() {
   const supabase = await createClient();
 
-  // Live summary statistics for the family (public, safe aggregates)
+  // Live KPI stats for the section below hero (as requested)
   const { count: householdCount } = await supabase
     .from('public_households_view')
     .select('*', { count: 'exact', head: true })
@@ -33,16 +35,25 @@ export default async function Home() {
 
   return (
     <>
-      {/* Hero with BACKGROUND image (newly generated heritage tree bg) */}
-      <div className="relative w-full min-h-[88vh] flex items-center justify-center overflow-hidden pt-8 pb-12">
-        {/* Background layer - the elegant wide heritage image */}
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/images/hero-bg.jpg')" }}
+      {/* Preload key images for performance (hero background and tree fallback) */}
+      {/* Consider switching to next/image + priority for hero-bg/hero-tree in future for automatic optimization/preload (no design change needed) */}
+      <link rel="preload" href="/images/hero-bg.jpg" as="image" />
+      <link rel="preload" href="/images/hero-tree.png" as="image" />
+
+      {/* Hero with BACKGROUND image (the awesome version you liked - image directly as background for the hero section) */}
+      {/* Adjusted pt-0 so layout's pt-24 (for fixed header) provides the hero-only top space. */}
+      <div
+        className="relative w-full min-h-[88vh] flex items-center justify-center overflow-hidden pt-0 pb-12"
+      >
+        {/* Hero background image faded via opacity so text is visible (not vibrant). Change this opacity value to adjust how faded the image is. */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center" 
+          style={{ backgroundImage: "url('/images/hero-bg.jpg')", opacity: 0.35 }} 
         />
-        {/* Warm, readable overlay scrim (light parchment tint + gradient for depth + subtle vignette) */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#f7f3eb]/65 via-[#f7f3eb]/82 to-[#f7f3eb]/96" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_40%,rgba(247,243,235,0.35)_75%)]" />
+
+        {/* Subtle dark vignette for depth - kept minimal */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/2 via-black/3 to-black/5" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_60%,rgba(0,0,0,0.03)_80%)]" />
 
         <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
           <div className="inline-flex items-center gap-2 px-5 py-1.5 rounded-full bg-surface/90 border border-border text-[11px] font-semibold tracking-[0.3em] text-muted mb-8 shadow-sm">
@@ -50,11 +61,11 @@ export default async function Home() {
             EST. LATE 1800s • RAJASTHAN ROOTS • ONE KUTUMB
           </div>
 
-          <h1 className="font-serif text-[52px] leading-[1.02] md:text-[72px] md:leading-[0.96] font-bold tracking-[-0.035em] text-foreground mb-6">
+          <h1 className="font-serif text-[52px] leading-[1.02] md:text-[72px] md:leading-[0.96] font-bold tracking-[-0.035em] text-foreground mb-6 drop-shadow-[0_2px_10px_rgba(0,0,0,0.35)]">
             Mehta Kutumb.<br />One family.<br />A thousand stories.
           </h1>
 
-          <p className="max-w-2xl mx-auto text-[18px] md:text-[20px] leading-relaxed text-foreground/80 mb-10">
+          <p className="max-w-2xl mx-auto text-[18px] md:text-[20px] leading-relaxed text-foreground/80 mb-10 drop-shadow-[0_1px_6px_rgba(0,0,0,0.25)]">
             A living private archive of our people — across continents, generations and households.<br />
             Honouring where we came from. Staying connected wherever life has taken us.
           </p>
@@ -68,36 +79,18 @@ export default async function Home() {
             </Link>
           </div>
 
-          <p className="mt-6 text-xs text-muted tracking-[1.5px]">PRIVATE • APPROVED MEMBERS ONLY • BUILT FOR THE MEHTA FAMILY</p>
+          <p className="mt-6 text-xs text-muted tracking-[1.5px] drop-shadow-[0_1px_3px_rgba(0,0,0,0.2)]">PRIVATE • APPROVED MEMBERS ONLY • BUILT FOR THE MEHTA FAMILY</p>
         </div>
       </div>
 
-      {/* Legacy Stats Bar — proud representative numbers for the real family */}
-      <div className="border-y border-border/70 bg-surface">
-        <div className="max-w-6xl mx-auto px-6 py-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            <div className="stat-card">
-              <div className="font-serif text-[42px] font-bold text-primary tracking-tighter">3,000+</div>
-              <div className="text-sm font-semibold text-muted tracking-widest mt-1">FAMILY MEMBERS</div>
-            </div>
-            <div className="stat-card">
-              <div className="font-serif text-[42px] font-bold text-primary tracking-tighter">12+</div>
-              <div className="text-sm font-semibold text-muted tracking-widest mt-1">HOUSEHOLDS</div>
-            </div>
-            <div className="stat-card">
-              <div className="font-serif text-[42px] font-bold text-primary tracking-tighter">5</div>
-              <div className="text-sm font-semibold text-muted tracking-widest mt-1">COUNTRIES</div>
-            </div>
-            <div className="stat-card">
-              <div className="font-serif text-[42px] font-bold text-primary tracking-tighter">8</div>
-              <div className="text-sm font-semibold text-muted tracking-widest mt-1">GENERATIONS</div>
-            </div>
-          </div>
-          <p className="text-center text-[13px] text-muted mt-4">One family. Many homes. Forever connected.</p>
-        </div>
+      {/* Family Tagline (as requested) */}
+      <div className="py-8 text-center bg-surface border-b border-border/70">
+        <p className="font-serif text-2xl md:text-3xl tracking-tight text-foreground">
+          One family. Many homes. Forever connected.
+        </p>
       </div>
 
-      {/* LIVE SUMMARY STATS — total persons, households, countries etc. from actual data */}
+      {/* LIVE KPI STATS (the section below the hero - totals for persons, households etc.) */}
       <div className="family-section py-14">
         <div className="text-center mb-8">
           <div className="text-xs uppercase tracking-[0.35em] text-accent font-semibold mb-1">THE MEHTA KUTUMB TODAY</div>
@@ -157,7 +150,7 @@ export default async function Home() {
 
           <div className="card p-9 flex flex-col group overflow-hidden">
             <div className="mb-8 -mx-2 -mt-2">
-              <img src="/images/hero-tree.png" alt="Family tree detail" className="w-24 h-24 rounded-2xl object-contain opacity-90" />
+              <Image src="/images/hero-tree.png" alt="Family tree detail" width={96} height={96} className="w-24 h-24 rounded-2xl object-contain opacity-90" />
             </div>
             <h3 className="font-serif text-3xl font-semibold tracking-tight mb-4">Interactive Lineage</h3>
             <p className="text-[15px] leading-relaxed text-muted mb-8 flex-1">

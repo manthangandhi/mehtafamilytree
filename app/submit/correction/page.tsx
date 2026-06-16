@@ -43,7 +43,7 @@ function CorrectionForm() {
         
         // Fetch household name
         const { data: hData } = await supabase.from('households').select('primary_member_name').eq('id', preselectedHousehold).single();
-        if (hData) setHouseholdName(hData.primary_member_name);
+        if (hData) setHouseholdName((hData as any).primary_member_name);
 
         // Fetch members
         const { data: mData } = await supabase.from('household_members')
@@ -123,7 +123,7 @@ function CorrectionForm() {
           
           <label className="block text-sm font-medium text-foreground mb-2">Which record are you correcting?</label>
           <select 
-            className="w-full h-11 px-3 py-2 bg-white border border-stone-200 rounded-lg text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
+            className="w-full h-11 px-3 py-2 bg-surface border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
             value={targetRecord}
             onChange={(e) => setTargetRecord(e.target.value)}
             required
@@ -134,7 +134,7 @@ function CorrectionForm() {
             ))}
           </select>
           
-          <p className="text-xs text-muted mt-3">If you want to correct a completely different household, please go back to the households list.</p>
+          <p className="text-sm text-muted mt-3">If you want to correct a completely different household, please go back to the households list.</p>
         </div>
       ) : (
         <Input
@@ -165,7 +165,7 @@ function CorrectionForm() {
 
       <div className="pt-4 flex justify-end gap-3">
         <Link href="/directory">
-          <Button type="button" variant="outline">Cancel</Button>
+          <Button type="button" variant="secondary">Cancel</Button>
         </Link>
         <Button type="submit" disabled={loading} className="w-full sm:w-auto">
           {loading ? 'Submitting...' : 'Submit Correction'}

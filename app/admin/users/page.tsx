@@ -43,7 +43,7 @@ export default async function AdminUsersPage() {
                     )}
                     {u.status !== 'blocked' && (
                       <form action={async () => { 'use server'; await updateUserStatusAction(u.id, 'block'); }}>
-                        <Button size="sm" variant="secondary" className="text-red-600 border-red-200 hover:bg-red-50">Block</Button>
+                        <Button size="sm" variant="secondary" className="text-accent border-accent/30 hover:bg-accent/10">Block</Button>
                       </form>
                     )}
                     {u.role !== 'admin' && (

@@ -89,7 +89,7 @@ export default async function EditHousehold({ params }: { params: Promise<{ id: 
             type="submit" 
             formAction={handleDeactivate} 
             variant="secondary"
-            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+            className="text-accent hover:text-primary hover:bg-accent/10"
           >
             Deactivate Household
           </Button>

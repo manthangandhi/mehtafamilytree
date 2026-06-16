@@ -11,10 +11,10 @@ export function HouseholdCard({ household, isApproved }: Props) {
   return (
     <Link
       href={`/households/${household.id}`}
-      className="group flex flex-col min-h-[152px] p-6 bg-surface rounded-3xl border border-border/70 hover:border-accent/40 hover:shadow-lg transition-all active:scale-[0.985]"
+      className="group flex flex-col min-h-[152px] p-6 bg-surface border border-border/70 rounded-3xl hover:border-accent/40 hover:shadow-lg transition-all active:scale-[0.985]"
     >
       <div className="flex items-start gap-4">
-        <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-primary/5 text-primary font-serif text-[26px] font-bold border border-border/50 overflow-hidden">
+        <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center bg-primary/5 text-primary font-serif text-[26px] font-bold border border-border/50 rounded-3xl overflow-hidden">
           {household.primary_member_name.charAt(0)}
         </div>
         <div className="flex-grow min-w-0">

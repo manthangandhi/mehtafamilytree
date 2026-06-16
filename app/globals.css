@@ -61,11 +61,11 @@
   }
   
   .table th {
-    @apply py-4 px-6 font-semibold text-muted tracking-wide border-b border-border/50 bg-surface-hover/60 whitespace-nowrap;
+    @apply py-5 px-6 font-semibold text-muted tracking-wide border-b border-border/50 bg-surface-hover/60 whitespace-nowrap; /* more py for elders on mobile */
   }
   
   .table td {
-    @apply py-4 px-6 border-b border-border/30;
+    @apply py-5 px-6 border-b border-border/30;
   }
 
   .input {
@@ -91,5 +91,40 @@
 
   .page-title {
     @apply font-serif text-[40px] md:text-[48px] leading-[1.05] font-semibold tracking-[-0.025em] text-foreground;
+  }
+
+  /* vamsam-gradient (canonical warm heritage bg) - source of truth in globals.css for auth/centered pages */
+  .vamsam-gradient {
+    @apply bg-gradient-to-b from-background to-surface;
+  }
+
+  /* Custom prose for heritage content - standardized, uses theme colors (replaces plain prose) */
+  .prose-heritage {
+    color: var(--color-foreground);
+    max-width: none;
+  }
+  .prose-heritage h1, .prose-heritage h2, .prose-heritage h3, .prose-heritage h4 {
+    font-family: var(--font-serif);
+    color: var(--color-foreground);
+    font-weight: 600;
+  }
+  .prose-heritage p {
+    color: var(--color-foreground);
+    line-height: 1.7;
+  }
+  .prose-heritage a {
+    color: var(--color-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .prose-heritage a:hover {
+    color: var(--color-primary-hover);
+  }
+  .prose-heritage ul, .prose-heritage ol {
+    color: var(--color-foreground);
+  }
+  .prose-heritage strong {
+    color: var(--color-foreground);
+    font-weight: 600;
   }
 }
