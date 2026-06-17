@@ -79,27 +79,9 @@ export default function FamilyTreeClient() {
         let households: any[] = householdsData || [];
         let relations: any[] = relationsData || [];
 
-        // Fallback to mock data ONLY if the database is literally completely empty
-        if ((personsError || !persons.length) && !relations.length) {
-          console.log("Using mock data due to missing real data or error:", personsError);
-          persons = [
-            { id: '1', full_name: 'John Doe Sr.', household_id: 'h1', role: 'Grandparent', avatar_url: '/images/hero-tree.png' },
-            { id: '2', full_name: 'Jane Doe Sr.', household_id: 'h1', role: 'Grandparent', avatar_url: '/images/hero-tree.png' },
-            { id: '3', full_name: 'Bob Doe', household_id: 'h2', role: 'Parent', avatar_url: '/images/hero-tree.png' },
-            { id: '4', full_name: 'Alice Smith', household_id: 'h3', role: 'Parent', avatar_url: '/images/hero-tree.png' },
-            { id: '5', full_name: 'Charlie Doe', household_id: 'h2', role: 'Child', avatar_url: '/images/hero-tree.png' },
-          ];
-          households = [
-            { id: 'h1', name: 'Main Estate' },
-            { id: 'h2', name: 'Doe Residence' },
-            { id: 'h3', name: 'Smith Home' },
-          ];
-          relations = [
-            { person_id: '1', related_person_id: '3', relationship_type: 'child' },
-            { person_id: '1', related_person_id: '4', relationship_type: 'child' },
-            { person_id: '3', related_person_id: '5', relationship_type: 'child' },
-          ];
-        }
+        // NOTE: Mock data fallback has been removed.
+        // The visualizer now only shows real data from the database.
+        // If no data exists, an empty state will be shown below.
 
         const householdMap = households.reduce((acc: any, h: any) => {
           acc[h.id] = h.primary_member_name ? `${h.primary_member_name}'s Household` : h.household_code || 'Unknown Household';
@@ -246,7 +228,8 @@ export default function FamilyTreeClient() {
         setNodes(newNodes);
         setEdges(newEdges);
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching family tree data:", err);
+        // Leave nodes/edges empty on error - no mock data
       } finally {
         setLoading(false);
       }
@@ -263,6 +246,28 @@ export default function FamilyTreeClient() {
         <div className="flex flex-col items-center gap-3">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent"></div>
           <p className="text-white/60 text-sm">Loading our family connections across households...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (nodes.length === 0) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-surface">
+        <div className="text-center max-w-md px-6">
+          <div className="mx-auto mb-6 h-16 w-16 rounded-2xl bg-surface-hover border border-border flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-muted">
+              <path d="M17 10.5V6a1 1 0 0 0-1-1h-2.5"/><path d="M11 6V3a1 1 0 0 0-1-1H7.5"/><path d="M12 12H3"/><path d="M18 12h3"/><path d="M12 12v9"/><path d="M12 12L3 3"/><path d="m12 12 9-9"/>
+            </svg>
+          </div>
+          <h3 className="font-serif text-2xl font-semibold text-foreground mb-2">No lineage data yet</h3>
+          <p className="text-muted mb-6">
+            The interactive tree will appear here once real family members and relationships are added to the database.
+          </p>
+          <div className="text-xs text-muted">
+            Admins can add households and persons via the admin panel.<br />
+            Real data only — no demo placeholders.
+          </div>
         </div>
       </div>
     );

@@ -316,6 +316,39 @@ export async function deactivateHouseholdAction(householdId: string) {
 }
 
 /**
+ * ADMIN: Hard delete a household (with cleanup of members).
+ * Use with caution. For soft, use deactivateHouseholdAction.
+ */
+export async function deleteHouseholdAdmin(householdId: string) {
+  const current = await requireAdmin();
+  const adminClient = createAdminClient();
+
+  const { data: oldH } = await adminClient.from('households').select('*').eq('id', householdId).single();
+
+  // Remove member links first
+  await adminClient.from('household_members').delete().eq('household_id', householdId);
+
+  // Delete the household
+  const { error } = await adminClient.from('households').delete().eq('id', householdId);
+
+  if (error) return { success: false, error: error.message };
+
+  await logAudit({
+    action_type: 'ADMIN_DELETE_HOUSEHOLD',
+    table_name: 'households',
+    record_id: householdId,
+    old_data: oldH,
+    new_data: null,
+    performed_by: current.id,
+  });
+
+  revalidatePath('/admin/households');
+  revalidatePath('/directory');
+
+  return { success: true };
+}
+
+/**
  * ADMIN: Add additional family members to an existing household (e.g. if missed during creation).
  * Creates persons, household_members links, and basic relationships.
  */

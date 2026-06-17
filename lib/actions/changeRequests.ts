@@ -354,6 +354,40 @@ export async function approveChangeRequestAction(requestId: string, adminNotes?:
         break;
       }
 
+      case 'delete_household': {
+        if (!req.target_record_id) throw new Error('Missing target_record_id');
+        await db.from('household_members').delete().eq('household_id', req.target_record_id);
+        const { error: delErr } = await db.from('households').delete().eq('id', req.target_record_id);
+        if (delErr) throw delErr;
+
+        await logAudit({
+          action_type: 'APPROVE_DELETE_HOUSEHOLD',
+          table_name: 'households',
+          record_id: req.target_record_id,
+          performed_by: current.id,
+          notes: adminNotes || 'Delete household approved',
+        });
+        break;
+      }
+
+      case 'delete_person': {
+        if (!req.target_record_id) throw new Error('Missing target_record_id');
+        await db.from('household_members').delete().eq('person_id', req.target_record_id);
+        await db.from('relationships').delete().or(`person_id.eq.${req.target_record_id},related_person_id.eq.${req.target_record_id}`);
+        await db.from('households').update({ primary_person_id: null }).eq('primary_person_id', req.target_record_id);
+        const { error: delErr } = await db.from('persons').delete().eq('id', req.target_record_id);
+        if (delErr) throw delErr;
+
+        await logAudit({
+          action_type: 'APPROVE_DELETE_PERSON',
+          table_name: 'persons',
+          record_id: req.target_record_id,
+          performed_by: current.id,
+          notes: adminNotes || 'Delete person approved',
+        });
+        break;
+      }
+
       // Core request types are handled; others can be extended similarly if needed.
       default:
         throw new Error(`Approval handler not implemented for request_type: ${req.request_type}`);

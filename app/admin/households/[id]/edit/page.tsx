@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { AddMembersForm } from '../AddMembersForm';
+import { deleteHouseholdAdmin } from '@/lib/actions/households';
+import { DeleteButton } from '@/components/admin/DeleteButton';
 
 export default async function EditHousehold({ params }: { params: Promise<{ id: string }> }) {
   await requireAdmin();
@@ -95,6 +97,18 @@ export default async function EditHousehold({ params }: { params: Promise<{ id: 
           </Button>
         </div>
       </form>
+
+      <div className="mt-4">
+        <DeleteButton
+          action={async () => {
+            'use server';
+            await deleteHouseholdAdmin(id);
+          }}
+          label="Delete Household"
+          confirmMessage="Hard delete this household? This cannot be undone."
+          className="text-sm underline text-red-600 hover:text-red-700"
+        />
+      </div>
 
       <div className="mt-8">
         <h3 className="section-title mb-2">Add Missed Family Members</h3>

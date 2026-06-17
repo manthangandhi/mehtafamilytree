@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { Button } from '@/components/ui/Button';
 import { StatusBadge } from '@/components/ui/StatusBadge';
+import { deleteHouseholdAdmin } from '@/lib/actions/households';
+import { DeleteButton } from '@/components/admin/DeleteButton';
 
 export default async function AdminHouseholds() {
   const admin = createAdminClient();
@@ -42,6 +44,15 @@ export default async function AdminHouseholds() {
                   <Link href={`/admin/households/${h.id}/edit`} className="text-sm underline">Edit</Link>
                   {' · '}
                   <Link href={`/households/${h.id}`} className="text-sm underline" target="_blank">View</Link>
+                  {' · '}
+                  <DeleteButton
+                    action={async () => {
+                      'use server';
+                      await deleteHouseholdAdmin(h.id);
+                    }}
+                    label="Delete"
+                    confirmMessage="Delete this household? This will remove members and links."
+                  />
                 </td>
               </tr>
             ))}

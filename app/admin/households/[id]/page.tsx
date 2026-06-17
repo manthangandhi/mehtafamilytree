@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { requireAdmin } from '@/lib/auth/requireAdmin';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { notFound } from 'next/navigation';
+import { deleteHouseholdAdmin } from '@/lib/actions/households';
+import { DeleteButton } from '@/components/admin/DeleteButton';
 
 export default async function AdminHouseholdView({ params }: { params: Promise<{ id: string }> }) {
   await requireAdmin();
@@ -29,8 +31,16 @@ export default async function AdminHouseholdView({ params }: { params: Promise<{
         <div className="md:col-span-2"><span className="text-muted">Notes:</span> {household.notes || '—'}</div>
       </div>
 
-      <div className="mt-4">
+      <div className="mt-4 flex gap-4">
         <Link href={`/admin/households/${id}/edit`} className="underline">Edit this household</Link>
+        <DeleteButton
+          action={async () => {
+            'use server';
+            await deleteHouseholdAdmin(id);
+          }}
+          label="Delete Household"
+          confirmMessage="Permanently delete this household and its member links?"
+        />
       </div>
     </div>
   );

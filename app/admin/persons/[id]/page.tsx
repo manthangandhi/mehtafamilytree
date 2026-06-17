@@ -2,6 +2,8 @@ import { requireAdmin } from '@/lib/auth/requireAdmin';
 import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { deletePersonAdmin } from '@/lib/actions/persons';
+import { DeleteButton } from '@/components/admin/DeleteButton';
 
 export default async function AdminPersonView({ params }: { params: Promise<{ id: string }> }) {
   await requireAdmin();
@@ -15,8 +17,16 @@ export default async function AdminPersonView({ params }: { params: Promise<{ id
     <div className="mx-auto max-w-2xl px-6 py-8">
       <Link href="/admin/persons" className="text-sm text-muted">← All Persons</Link>
       <h1 className="mt-3 text-xl font-semibold tracking-tight">{person.full_name}</h1>
-      <div className="mt-1">
+      <div className="mt-1 flex gap-4">
         <Link href={`/admin/persons/${id}/edit`} className="text-sm underline">Edit this person</Link>
+        <DeleteButton
+          action={async () => {
+            'use server';
+            await deletePersonAdmin(id);
+          }}
+          label="Delete Person"
+          confirmMessage="Permanently delete this person and remove all links/relationships?"
+        />
       </div>
 
       <div className="mt-6 card p-5 text-sm space-y-2">

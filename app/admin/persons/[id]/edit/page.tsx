@@ -4,6 +4,8 @@ import { requireAdmin } from '@/lib/auth/requireAdmin';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
+import { deletePersonAdmin } from '@/lib/actions/persons';
+import { DeleteButton } from '@/components/admin/DeleteButton';
 
 export default async function EditPerson({ params }: { params: Promise<{ id: string }> }) {
   await requireAdmin();
@@ -51,6 +53,18 @@ export default async function EditPerson({ params }: { params: Promise<{ id: str
         <label className="text-sm"><input type="checkbox" name="is_deceased" defaultChecked={person.is_deceased} /> Deceased</label>
         <Button type="submit">Save</Button>
       </form>
+
+      <div className="mt-4">
+        <DeleteButton
+          action={async () => {
+            'use server';
+            await deletePersonAdmin(id);
+          }}
+          label="Delete Person"
+          confirmMessage="Delete this person permanently?"
+          className="text-sm underline text-red-600 hover:text-red-700"
+        />
+      </div>
     </div>
   );
 }
