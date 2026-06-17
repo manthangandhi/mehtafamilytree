@@ -374,7 +374,7 @@ export async function approveChangeRequestAction(requestId: string, adminNotes?:
         if (!req.target_record_id) throw new Error('Missing target_record_id');
         await db.from('household_members').delete().eq('person_id', req.target_record_id);
         await db.from('relationships').delete().or(`person_id.eq.${req.target_record_id},related_person_id.eq.${req.target_record_id}`);
-        await db.from('households').update({ primary_person_id: null }).eq('primary_person_id', req.target_record_id);
+        await (db.from('households') as any).update({ primary_person_id: null }).eq('primary_person_id', req.target_record_id);
         const { error: delErr } = await db.from('persons').delete().eq('id', req.target_record_id);
         if (delErr) throw delErr;
 

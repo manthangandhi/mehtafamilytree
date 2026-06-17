@@ -1,5 +1,6 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { requireApprovedMember } from '@/lib/auth/requireApprovedMember';
@@ -82,8 +83,7 @@ export async function deletePersonAdmin(personId: string) {
     .or(`person_id.eq.${personId},related_person_id.eq.${personId}`);
 
   // Clear as primary from any household
-  await adminClient
-    .from('households')
+  await (adminClient.from('households') as any)
     .update({ primary_person_id: null })
     .eq('primary_person_id', personId);
 
