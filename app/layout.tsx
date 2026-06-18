@@ -5,6 +5,7 @@ import { Toaster } from "sonner";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { Footer } from "@/components/layout/Footer";
 import CookieBanner from "@/components/CookieBanner";
+import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -36,13 +37,16 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${inter.variable} ${playfair.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col bg-background text-foreground">
-        <AppHeader />
-        <div className="flex-1 pt-24 pb-12 bg-background">{children}</div>
-        <Footer />
-        <CookieBanner />
-        <Toaster position="top-center" richColors closeButton />
+      <body className="min-h-full flex flex-col bg-background text-foreground" suppressHydrationWarning>
+        <LanguageProvider>
+          <AppHeader />
+          <div className="flex-1 pt-14 pb-8 bg-background">{children}</div>
+          <Footer />
+          <CookieBanner />
+          <Toaster position="top-center" richColors closeButton />
+        </LanguageProvider>
       </body>
     </html>
   );

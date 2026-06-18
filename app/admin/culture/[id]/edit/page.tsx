@@ -15,6 +15,7 @@ export default function EditCulturalPage({ params }: { params: Promise<{ id: str
   const [id, setId] = React.useState('');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [language, setLanguage] = useState('English');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -22,14 +23,24 @@ export default function EditCulturalPage({ params }: { params: Promise<{ id: str
     (async () => {
       const p = await params;
       setId(p.id);
-      // For simplicity we keep state minimal; a full server fetch + revalidation would be ideal in production.
+      try {
+        const supabase = (await import('@/lib/supabase/client')).createClient();
+        const { data } = await (supabase.from('cultural_pages') as any).select('title, content, language').eq('id', p.id).single();
+        if (data) {
+          setTitle(data.title || '');
+          setContent(data.content || '');
+          setLanguage(data.language || 'English');
+        }
+      } catch (e) {
+        // keep defaults
+      }
     })();
   }, [params]);
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const res = await updateCulturalPageAction(id, { title, content });
+    const res = await updateCulturalPageAction(id, { title, content, language });
     if (res.success) {
       toast.success('Updated');
       router.push('/admin/culture');
@@ -49,6 +60,14 @@ export default function EditCulturalPage({ params }: { params: Promise<{ id: str
       <h1 className="mt-2 text-xl font-semibold">Edit Cultural Page</h1>
       <form onSubmit={save} className="mt-6 space-y-4 card p-6">
         <Input label="Title" value={title} onChange={e=>setTitle(e.target.value)} />
+        <div>
+          <label className="label">Language (for speaker mode)</label>
+          <select className="input" value={language} onChange={e=>setLanguage(e.target.value)}>
+            <option value="English">English</option>
+            <option value="Gujarati">Gujarati</option>
+            <option value="Hindi">Hindi</option>
+          </select>
+        </div>
         <Textarea 
           label="Content (Markdown supported)" 
           value={content} 

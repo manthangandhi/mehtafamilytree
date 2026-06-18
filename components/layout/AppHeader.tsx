@@ -4,14 +4,15 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Menu, X } from "lucide-react";
+import { useLanguage, type Lang } from "@/lib/i18n/LanguageContext";
 
 export function AppHeader() {
+  const { lang, setLang, t } = useLanguage();
   const [userState, setUserState] = useState<{
     name: string | null;
     isAdmin: boolean;
     isApproved: boolean;
   } | null>(null);
-  const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -52,29 +53,19 @@ export function AppHeader() {
       }
     });
 
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener("scroll", handleScroll);
-
     return () => {
       subscription.unsubscribe();
-      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
   const initials = userState?.name?.substring(0, 2).toUpperCase() || "US";
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 glass-header ${
-        isScrolled ? "py-4 shadow-sm" : "py-6"
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+    <header className="fixed top-0 left-0 right-0 z-50 h-14 glass-header border-b border-border/60">
+      <div className="max-w-7xl mx-auto px-6 h-full flex items-center">
         {/* Logo */}
-        <Link href="/" className="group flex items-center gap-3">
-          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 64 64" fill="none" className="h-16 w-16 transition-transform duration-300 group-hover:scale-105">
+        <Link href="/" className="group flex items-center gap-3 flex-shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 64 64" fill="none" className="h-8 w-8 transition-transform duration-300 group-hover:scale-105">
             {/* Deep roots — heritage & lineage */}
             <path d="M24 51 L19 57" stroke="#0B2E24" strokeWidth="1.6" strokeLinecap="round" />
             <path d="M32 51 L32 57" stroke="#0B2E24" strokeWidth="1.6" strokeLinecap="round" />
@@ -99,92 +90,126 @@ export function AppHeader() {
             <circle cx="59" cy="49" r="2.15" fill="#C8A97E" stroke="#0B2E24" strokeWidth="0.95" />
             <circle cx="45" cy="49" r="2.15" fill="#C8A97E" stroke="#0B2E24" strokeWidth="0.95" />
           </svg>
-          <span className="font-serif font-bold text-2xl tracking-tight hidden sm:block text-foreground">
+          <span className="font-serif font-bold text-xl tracking-tight hidden sm:block text-foreground">
             Mehta Kutumb
           </span>
         </Link>
 
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8">
-          <Link href="/directory" className="text-sm font-medium text-muted hover:text-primary transition-colors">
-            Households
+        {/* Desktop Nav - Centered */}
+        <nav className="hidden md:flex flex-1 justify-center items-center gap-6">
+          <Link href="/directory" className="text-sm font-medium text-muted hover:text-primary transition-all hover:underline underline-offset-4 decoration-accent/50">
+            {t('households')}
           </Link>
-          <Link href="/family-tree-visualizer" className="text-sm font-medium text-muted hover:text-primary transition-colors">
-            Interactive Tree
+          <Link href="/family-tree-visualizer" className="text-sm font-medium text-muted hover:text-primary transition-all hover:underline underline-offset-4 decoration-accent/50">
+            {t('tree')}
           </Link>
-          <Link href="/culture" className="text-sm font-medium text-muted hover:text-primary transition-colors">
-            Culture
+          <Link href="/culture" className="text-sm font-medium text-muted hover:text-primary transition-all hover:underline underline-offset-4 decoration-accent/50">
+            {t('culture')}
           </Link>
-          <Link href="/dashboard" className="text-sm font-medium text-muted hover:text-primary transition-colors">
-            Dashboard
+          <Link href="/dashboard" className="text-sm font-medium text-muted hover:text-primary transition-all hover:underline underline-offset-4 decoration-accent/50">
+            {t('dashboard')}
           </Link>
           {userState?.isAdmin && (
-            <Link href="/admin" className="text-sm font-bold text-primary hover:opacity-80 transition-opacity">
-              Admin
+            <Link href="/admin" className="text-sm font-bold text-primary hover:opacity-80 transition-opacity hover:underline underline-offset-4 decoration-accent">
+              {t('admin')}
             </Link>
           )}
         </nav>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 flex-shrink-0">
           {userState ? (
-            <div className="hidden sm:flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-2.5">
               <Link
                 href="/my-profile"
-                className="h-10 w-10 flex items-center justify-center rounded-full bg-surface border border-border text-xs font-bold tracking-widest text-primary transition-all hover:bg-surface-hover shadow-sm"
+                className="h-8 w-8 flex items-center justify-center rounded-full bg-surface border border-border text-[10px] font-bold tracking-widest text-primary transition-all hover:bg-surface-hover shadow-sm"
                 title="My Profile"
               >
                 {initials}
               </Link>
               <form action="/api/auth/signout" method="POST">
-                <button type="submit" className="text-xs font-bold text-muted hover:text-accent transition-colors uppercase tracking-wider">
-                  Sign Out
+                <button type="submit" className="text-xs font-medium text-muted hover:text-accent transition-colors">
+                  {t('signOut')}
                 </button>
               </form>
             </div>
           ) : (
             <Link
               href="/login"
-              className="hidden sm:inline-flex btn btn-primary"
+              className="hidden sm:inline-flex btn btn-primary h-9 px-4 text-xs"
             >
-              Sign In
+              {t('signIn')}
             </Link>
           )}
 
+          {/* Language switcher */}
+          <div className="hidden sm:flex items-center gap-0.5 text-[10px] border border-border rounded-full p-0.5 bg-surface/60">
+            {(['en','gu','hi'] as Lang[]).map(l => (
+              <button
+                key={l}
+                onClick={() => setLang(l)}
+                className={`px-1.5 py-0.5 rounded-full transition ${lang === l ? 'bg-primary text-white' : 'hover:bg-surface-hover text-muted'}`}
+                title={l === 'en' ? 'English' : l === 'gu' ? 'ગુજરાતી' : 'हिन्दी'}
+              >
+                {l === 'en' ? 'EN' : l === 'gu' ? 'ગુ' : 'हि'}
+              </button>
+            ))}
+          </div>
+
           {/* Mobile Menu Toggle */}
           <button
-            className="md:hidden flex h-10 w-10 items-center justify-center rounded-full bg-surface border border-border text-foreground transition-all active:scale-95"
+            className="md:hidden flex h-8 w-8 items-center justify-center rounded-full bg-surface border border-border text-foreground transition-all active:scale-95"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
-            {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+            {mobileMenuOpen ? <X size={16} /> : <Menu size={16} />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Menu Overlay */}
+      {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="absolute top-full left-0 right-0 bg-surface border-b border-border shadow-2xl md:hidden animate-fade-in origin-top">
-          <nav className="flex flex-col p-6 gap-4">
-            <Link href="/directory" className="text-lg font-serif font-bold text-foreground">Households</Link>
-            <Link href="/family-tree-visualizer" className="text-lg font-serif font-bold text-foreground">Interactive Tree</Link>
-            <Link href="/culture" className="text-lg font-serif font-bold text-foreground">Culture</Link>
-            <Link href="/dashboard" className="text-lg font-serif font-bold text-foreground">Dashboard</Link>
-            {userState?.isAdmin && (
-              <Link href="/admin" className="text-lg font-serif font-bold text-primary">Admin</Link>
-            )}
-            <hr className="border-border my-2" />
-            {userState ? (
-              <>
-                <Link href="/my-profile" className="text-lg font-serif font-medium text-muted">My Profile</Link>
-                <form action="/api/auth/signout" method="POST">
-                  <button type="submit" className="text-lg font-serif font-medium text-accent w-full text-left">Sign Out</button>
-                </form>
-              </>
-            ) : (
-              <Link href="/login" className="text-lg font-serif font-medium text-foreground">Sign In</Link>
-            )}
-          </nav>
-        </div>
+        <>
+          {/* Backdrop for tap outside to close */}
+          <div 
+            className="fixed inset-0 z-40 bg-black/20 md:hidden" 
+            style={{ top: '56px' }}
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          <div className="fixed top-14 left-0 right-0 z-50 bg-surface border-b border-border shadow-xl md:hidden animate-fade-in">
+            <nav className="flex flex-col p-4 gap-2 text-base">
+              <Link href="/directory" onClick={() => setMobileMenuOpen(false)} className="py-1.5 font-serif font-medium text-foreground hover:text-primary">{t('households')}</Link>
+              <Link href="/family-tree-visualizer" onClick={() => setMobileMenuOpen(false)} className="py-1.5 font-serif font-medium text-foreground hover:text-primary">{t('tree')}</Link>
+              <Link href="/culture" onClick={() => setMobileMenuOpen(false)} className="py-1.5 font-serif font-medium text-foreground hover:text-primary">{t('culture')}</Link>
+              <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="py-1.5 font-serif font-medium text-foreground hover:text-primary">{t('dashboard')}</Link>
+              {userState?.isAdmin && (
+                <Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="py-1.5 font-serif font-medium text-primary">{t('admin')}</Link>
+              )}
+              <div className="my-1 border-t border-border" />
+              {/* Mobile lang compact */}
+              <div className="flex gap-1 text-xs py-1">
+                {(['en','gu','hi'] as Lang[]).map(l => (
+                  <button 
+                    key={l} 
+                    onClick={() => { setLang(l); setMobileMenuOpen(false); }} 
+                    className={`px-2 py-0.5 rounded transition ${lang===l ? 'bg-primary text-white' : 'border border-border hover:bg-surface-hover'}`}
+                  >
+                    {l==='en'?'EN':l==='gu'?'ગુ':'हि'}
+                  </button>
+                ))}
+              </div>
+              {userState ? (
+                <>
+                  <Link href="/my-profile" onClick={() => setMobileMenuOpen(false)} className="py-1.5 font-serif font-medium text-muted hover:text-primary">{t('myProfile')}</Link>
+                  <form action="/api/auth/signout" method="POST">
+                    <button type="submit" onClick={() => setMobileMenuOpen(false)} className="py-1.5 text-left font-serif font-medium text-accent hover:text-primary">{t('signOut')}</button>
+                  </form>
+                </>
+              ) : (
+                <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="py-1.5 font-serif font-medium text-foreground hover:text-primary">{t('signIn')}</Link>
+              )}
+            </nav>
+          </div>
+        </>
       )}
     </header>
   );

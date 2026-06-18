@@ -499,3 +499,412 @@ export async function submitNewHouseholdRequestAction(input: unknown) {
 
   return { success: true };
 }
+
+/* ============================================================
+   DIRECT MEMBER ACTIONS (approved users manage ONLY their own)
+   No admin approval step. RLS + ownership checks enforce.
+============================================================ */
+
+/**
+ * Get the household owned/managed by the current approved user (by created_by or owner_profile_id).
+ */
+export async function getMyHousehold() {
+  const current = await getCurrentUserProfile();
+  if (!current?.profile || current.profile.status !== 'approved') {
+    return null;
+  }
+  const supabase = await createClient();
+  try {
+    const { data } = await supabase
+      .from('member_households_view')
+      .select('*')
+      .or(`created_by.eq.${current.id},owner_profile_id.eq.${current.id}`)
+      .eq('status', 'active')
+      .maybeSingle();
+    return data ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * MEMBER (owner): Create a new household + primary SELF + members.
+ * Only one household per user enforced at action level (simple check).
+ */
+export async function createMyHouseholdAction(formData: unknown) {
+  const current = await getCurrentUserProfile();
+  if (!current?.profile || current.profile.status !== 'approved') {
+    return { success: false, error: 'Only approved members can create their household' };
+  }
+
+  const parsed = createHouseholdWithMembersSchema.safeParse(formData);
+  if (!parsed.success) {
+    return { success: false, error: 'Validation failed', issues: parsed.error.issues };
+  }
+
+  // Enforce single household per owner (simple)
+  const existing = await getMyHousehold();
+  if (existing) {
+    return { success: false, error: 'You already have a household. Edit your existing one instead.' };
+  }
+
+  const { household: hData, members } = parsed.data;
+  const supabase = await createClient(); // RLS will allow insert for owner
+  // For multi-row safety we use admin client after checks
+  const adminClient = createAdminClient();
+
+  try {
+    const primaryRow = members.find((m) => m.relationship_to_head === 'SELF');
+    if (!primaryRow) {
+      return { success: false, error: 'Primary member (SELF) is required' };
+    }
+
+    const primaryPersonInsert: any = {
+      full_name: primaryRow.full_name,
+      gender: primaryRow.gender ?? null,
+      date_of_birth: primaryRow.date_of_birth || null,
+      date_of_death: primaryRow.date_of_death || null,
+      is_deceased: primaryRow.is_deceased ?? false,
+      education: primaryRow.education || null,
+      occupation: primaryRow.occupation || null,
+      marital_status: primaryRow.marital_status || null,
+      mobile_number: primaryRow.mobile_number || null,
+      whatsapp_number: primaryRow.whatsapp_number || null,
+      email: primaryRow.email || null,
+      blood_group: primaryRow.blood_group || null,
+      avatar_url: primaryRow.avatar_url || null,
+      notes: primaryRow.notes || null,
+      created_by: current.id,
+      father_id: (primaryRow as any).father_id || null,
+      mother_id: (primaryRow as any).mother_id || null,
+      spouse_id: (primaryRow as any).spouse_id || null,
+    };
+
+    const { data: primaryPerson, error: pErr } = await (adminClient.from('persons') as any)
+      .insert(primaryPersonInsert)
+      .select()
+      .single();
+
+    if (pErr || !primaryPerson) throw new Error(pErr?.message || 'Failed to create primary person');
+
+    const householdInsert: any = {
+      household_code: hData.household_code || null,
+      primary_member_name: hData.primary_member_name,
+      primary_person_id: primaryPerson.id,
+      native_place: hData.native_place || null,
+      residence_address: hData.residence_address || null,
+      business_address: hData.business_address || null,
+      phone_number: hData.phone_number || null,
+      mobile_number: hData.mobile_number || null,
+      whatsapp_number: hData.whatsapp_number || null,
+      email: hData.email || null,
+      city: hData.city || null,
+      state: hData.state || null,
+      country: hData.country || 'India',
+      notes: hData.notes || null,
+      verified: false, // members cannot self-verify
+      visibility_level: hData.visibility_level || 'members',
+      status: hData.status || 'active',
+      created_by: current.id,
+      owner_profile_id: current.id,
+    };
+
+    const { data: household, error: hErr } = await (adminClient.from('households') as any)
+      .insert(householdInsert)
+      .select()
+      .single();
+
+    if (hErr || !household) throw new Error(hErr?.message || 'Failed to create household');
+
+    // Insert SELF household_member
+    await (adminClient.from('household_members') as any).insert({
+      household_id: household.id,
+      person_id: primaryPerson.id,
+      relationship_to_head: 'SELF',
+      display_order: 0,
+      is_primary: true,
+      created_at: new Date().toISOString(),
+    });
+
+    // Add other members + basic rels (same as admin flow)
+    let displayOrder = 1;
+    for (const m of members) {
+      if (m.relationship_to_head === 'SELF') continue;
+
+      const pInsert: any = {
+        full_name: m.full_name,
+        gender: m.gender ?? null,
+        date_of_birth: m.date_of_birth || null,
+        date_of_death: m.date_of_death || null,
+        is_deceased: m.is_deceased ?? false,
+        education: m.education || null,
+        occupation: m.occupation || null,
+        marital_status: m.marital_status || null,
+        mobile_number: m.mobile_number || null,
+        whatsapp_number: m.whatsapp_number || null,
+        email: m.email || null,
+        blood_group: m.blood_group || null,
+        avatar_url: m.avatar_url || null,
+        notes: m.notes || null,
+        created_by: current.id,
+        father_id: (m as any).father_id || null,
+        mother_id: (m as any).mother_id || null,
+        spouse_id: (m as any).spouse_id || null,
+      };
+
+      const { data: newP } = await (adminClient.from('persons') as any)
+        .insert(pInsert).select().single();
+
+      if (newP) {
+        await (adminClient.from('household_members') as any).insert({
+          household_id: household.id,
+          person_id: newP.id,
+          relationship_to_head: m.relationship_to_head,
+          display_order: displayOrder++,
+          is_primary: false,
+        });
+
+        // basic spouse/child relationships
+        if (['WIFE', 'HUSBAND'].includes(m.relationship_to_head)) {
+          await (adminClient.from('relationships') as any).insert([
+            { person_id: primaryPerson.id, related_person_id: newP.id, relationship_type: 'spouse', created_by: current.id },
+            { person_id: newP.id, related_person_id: primaryPerson.id, relationship_type: 'spouse', created_by: current.id },
+          ]);
+        }
+        if (['SON', 'DAUGHTER'].includes(m.relationship_to_head)) {
+          await (adminClient.from('relationships') as any).insert({
+            person_id: primaryPerson.id, related_person_id: newP.id, relationship_type: 'child', created_by: current.id,
+          });
+        }
+      }
+    }
+
+    await logAudit({
+      action_type: 'MEMBER_CREATE_HOUSEHOLD',
+      table_name: 'households',
+      record_id: household.id,
+      new_data: { primary: primaryRow.full_name },
+      performed_by: current.id,
+    });
+
+    revalidatePath('/directory');
+    revalidatePath('/dashboard');
+    revalidatePath(`/households/${household.id}`);
+    revalidatePath('/family-tree');
+    revalidatePath('/family-tree-visualizer');
+
+    return { success: true, householdId: household.id };
+  } catch (err: any) {
+    console.error('createMyHouseholdAction', err);
+    return { success: false, error: err.message || 'Failed to create household' };
+  }
+}
+
+/**
+ * MEMBER (owner): Update core household fields.
+ */
+export async function updateMyHouseholdAction(householdId: string, data: unknown) {
+  const current = await getCurrentUserProfile();
+  if (!current?.profile || current.profile.status !== 'approved') {
+    return { success: false, error: 'Not authorized' };
+  }
+
+  const parsed = householdSchema.partial().safeParse(data);
+  if (!parsed.success) {
+    return { success: false, error: 'Invalid data' };
+  }
+
+  // Verify ownership OR admin override
+  const supabase = await createClient();
+  const { data: h } = await (supabase.from('households') as any)
+    .select('id, created_by, owner_profile_id')
+    .eq('id', householdId)
+    .single();
+
+  const isOwner = h && (h.created_by === current.id || h.owner_profile_id === current.id);
+  const isAdmin = current.profile.role === 'admin';
+  if (!isOwner && !isAdmin) {
+    return { success: false, error: 'You can only edit your own household' };
+  }
+
+  const adminClient = createAdminClient();
+  const { data: oldH } = await adminClient.from('households').select('*').eq('id', householdId).single();
+
+  const { data: updated, error } = await (adminClient.from('households') as any)
+    .update({ ...parsed.data, updated_by: current.id })
+    .eq('id', householdId)
+    .select()
+    .single();
+
+  if (error) return { success: false, error: error.message };
+
+  await logAudit({
+    action_type: 'MEMBER_UPDATE_HOUSEHOLD',
+    table_name: 'households',
+    record_id: householdId,
+    old_data: oldH,
+    new_data: updated,
+    performed_by: current.id,
+  });
+
+  revalidatePath('/directory');
+  revalidatePath(`/households/${householdId}`);
+  revalidatePath(`/households/${householdId}/edit`);
+  revalidatePath('/dashboard');
+
+  return { success: true };
+}
+
+/**
+ * MEMBER (owner): Add family member(s) to own household (direct, no approval).
+ */
+export async function addMembersToMyHouseholdAction(householdId: string, membersData: unknown) {
+  const current = await getCurrentUserProfile();
+  if (!current?.profile || current.profile.status !== 'approved') {
+    return { success: false, error: 'Not authorized' };
+  }
+
+  const parsed = z.array(familyMemberRowSchema).safeParse(membersData);
+  if (!parsed.success) return { success: false, error: 'Invalid member data' };
+
+  const adminClient = createAdminClient();
+
+  // Verify owner OR admin override
+  const { data: h } = await (adminClient.from('households') as any)
+    .select('id, created_by, owner_profile_id, primary_person_id')
+    .eq('id', householdId).single();
+
+  const isOwner = h && (h.created_by === current.id || h.owner_profile_id === current.id);
+  const isAdmin = current.profile.role === 'admin';
+  if (!isOwner && !isAdmin) return { success: false, error: 'You can only add members to your own household' };
+
+  const primaryPersonId = h.primary_person_id;
+  const members = parsed.data;
+  let displayOrder = 1;
+
+  try {
+    for (const m of members) {
+      if (m.relationship_to_head === 'SELF') continue;
+
+      const pInsert: any = {
+        full_name: m.full_name,
+        gender: m.gender ?? null,
+        date_of_birth: m.date_of_birth || null,
+        date_of_death: m.date_of_death || null,
+        is_deceased: m.is_deceased ?? false,
+        education: m.education || null,
+        occupation: m.occupation || null,
+        marital_status: m.marital_status || null,
+        mobile_number: m.mobile_number || null,
+        whatsapp_number: m.whatsapp_number || null,
+        email: m.email || null,
+        blood_group: m.blood_group || null,
+        avatar_url: m.avatar_url || null,
+        notes: m.notes || null,
+        created_by: current.id,
+        father_id: (m as any).father_id || null,
+        mother_id: (m as any).mother_id || null,
+        spouse_id: (m as any).spouse_id || null,
+      };
+
+      const { data: newPerson } = await (adminClient.from('persons') as any)
+        .insert(pInsert).select().single();
+
+      if (newPerson) {
+        await (adminClient.from('household_members') as any).insert({
+          household_id: householdId,
+          person_id: newPerson.id,
+          relationship_to_head: m.relationship_to_head,
+          display_order: displayOrder++,
+          is_primary: false,
+        });
+
+        if (primaryPersonId && ['WIFE', 'HUSBAND'].includes(m.relationship_to_head)) {
+          await (adminClient.from('relationships') as any).insert([
+            { person_id: primaryPersonId, related_person_id: newPerson.id, relationship_type: 'spouse', created_by: current.id },
+            { person_id: newPerson.id, related_person_id: primaryPersonId, relationship_type: 'spouse', created_by: current.id },
+          ]);
+        }
+        if (primaryPersonId && ['SON', 'DAUGHTER'].includes(m.relationship_to_head)) {
+          await (adminClient.from('relationships') as any).insert({
+            person_id: primaryPersonId, related_person_id: newPerson.id, relationship_type: 'child', created_by: current.id,
+          });
+        }
+      }
+    }
+
+    await logAudit({
+      action_type: 'MEMBER_ADD_HOUSEHOLD_MEMBERS',
+      table_name: 'household_members',
+      record_id: householdId,
+      performed_by: current.id,
+    });
+
+    revalidatePath(`/households/${householdId}`);
+    revalidatePath(`/households/${householdId}/edit`);
+    revalidatePath('/directory');
+    revalidatePath('/family-tree-visualizer');
+
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Failed to add members' };
+  }
+}
+
+/**
+ * MEMBER (owner): Update a person that belongs to their household.
+ */
+export async function updateMyPersonAction(personId: string, data: unknown) {
+  const current = await getCurrentUserProfile();
+  if (!current?.profile || current.profile.status !== 'approved') {
+    return { success: false, error: 'Not authorized' };
+  }
+
+  const adminClient = createAdminClient();
+
+  // Verify ownership via household membership or created_by  OR admin override
+  const { data: person } = await (adminClient.from('persons') as any).select('id, created_by').eq('id', personId).single();
+  const { data: links } = await (adminClient.from('household_members') as any)
+    .select('household_id')
+    .eq('person_id', personId);
+
+  let owns = person && person.created_by === current.id;
+  if (!owns && links?.length) {
+    for (const l of links) {
+      const { data: hh } = await (adminClient.from('households') as any).select('created_by, owner_profile_id').eq('id', l.household_id).single();
+      if (hh && (hh.created_by === current.id || hh.owner_profile_id === current.id)) {
+        owns = true; break;
+      }
+    }
+  }
+  const isAdmin = current.profile.role === 'admin';
+  if (!owns && !isAdmin) return { success: false, error: 'You can only edit people in your own household' };
+
+  const { data: oldP } = await adminClient.from('persons').select('*').eq('id', personId).single();
+
+  const allowed = ['full_name','gender','date_of_birth','date_of_death','is_deceased','education','occupation','marital_status','mobile_number','whatsapp_number','email','blood_group','notes','avatar_url','father_id','mother_id','spouse_id'];
+  const updatePayload: any = { updated_by: current.id };
+  Object.keys(data as any).forEach(k => { if (allowed.includes(k)) updatePayload[k] = (data as any)[k]; });
+
+  const { data: updated, error } = await (adminClient.from('persons') as any)
+    .update(updatePayload)
+    .eq('id', personId)
+    .select()
+    .single();
+
+  if (error) return { success: false, error: error.message };
+
+  await logAudit({
+    action_type: 'MEMBER_UPDATE_PERSON',
+    table_name: 'persons',
+    record_id: personId,
+    old_data: oldP,
+    new_data: updated,
+    performed_by: current.id,
+  });
+
+  revalidatePath('/directory');
+  revalidatePath('/family-tree-visualizer');
+
+  return { success: true };
+}

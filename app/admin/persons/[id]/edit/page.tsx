@@ -23,6 +23,9 @@ export default async function EditPerson({ params }: { params: Promise<{ id: str
       occupation: formData.get('occupation') || null,
       avatar_url: formData.get('avatar_url') || null,
       notes: formData.get('notes') || null,
+      blood_group: formData.get('blood_group') || null,
+      mobile_number: formData.get('mobile_number') || null,
+      whatsapp_number: formData.get('whatsapp_number') || null,
       is_deceased: formData.get('is_deceased') === 'on',
     };
     const adminClient = createAdminClient();
@@ -45,12 +48,17 @@ export default async function EditPerson({ params }: { params: Promise<{ id: str
       <Link href="/admin/persons">← Persons</Link>
       <h1 className="mt-2 text-xl font-semibold">Edit Person</h1>
       <form action={save} className="mt-6 card space-y-4 p-6">
-        <input name="full_name" defaultValue={person.full_name} className="input" placeholder="Full Name" />
-        <input name="avatar_url" defaultValue={person.avatar_url || ''} className="input" placeholder="Avatar URL" />
+        <input name="full_name" defaultValue={person.full_name} className="input" placeholder="Full Name" required />
+        <input name="avatar_url" defaultValue={person.avatar_url || ''} className="input" placeholder="Avatar URL (or upload via household)" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input name="mobile_number" defaultValue={person.mobile_number || ''} className="input" placeholder="Mobile (with +code e.g. +91 98...)" />
+          <input name="whatsapp_number" defaultValue={person.whatsapp_number || ''} className="input" placeholder="WhatsApp" />
+        </div>
         <input name="education" defaultValue={person.education || ''} className="input" placeholder="Education" />
         <input name="occupation" defaultValue={person.occupation || ''} className="input" placeholder="Occupation" />
+        <input name="blood_group" defaultValue={person.blood_group || ''} className="input" placeholder="Blood Group" />
         <textarea name="notes" defaultValue={person.notes || ''} className="input min-h-[100px]" placeholder="Notes" />
-        <label className="text-sm"><input type="checkbox" name="is_deceased" defaultChecked={person.is_deceased} /> Deceased</label>
+        <label className="text-sm flex items-center gap-2"><input type="checkbox" name="is_deceased" defaultChecked={person.is_deceased} /> Deceased</label>
         <Button type="submit">Save</Button>
       </form>
 

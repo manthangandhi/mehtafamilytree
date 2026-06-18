@@ -144,7 +144,7 @@ All actions are audited. Privacy is always respected.
 1. Register the first user.
 2. Promote to admin + approved via SQL (one-time).
 3. (Optional but recommended) Use the "Confirm Email" button in Admin > Users for family members instead of relying on email links.
-4. Seed or manually create the first households using the rich form (pay attention to member order for correct wife/child linking).
+4. Create the first households using the rich form (pay attention to member order for correct wife/child linking).
 5. Share the site with family. Direct them to register, then wait for your approval.
 
 The app is now a complete, self-documenting handbook for your specific family.
@@ -176,7 +176,7 @@ lib/
   actions/ (households, changeRequests, users, culture, audit)
 db/migrations/
   001_initial_schema.sql
-  002_seed_data.sql
+  (002_seed_data.sql is deprecated and contains no data)
 components/
   ui/ forms/ admin/ directory/
 ```
@@ -204,13 +204,13 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 In the Supabase dashboard → SQL Editor, run the files in order:
 
 1. `db/migrations/001_initial_schema.sql`
-2. `db/migrations/002_seed_data.sql`
 
 This creates:
-- All 8 tables + views + indexes + triggers
+- All tables + views + indexes + triggers
 - RLS policies (public / approved member / admin)
 - Auto profile creation trigger on new auth.users
-- Two fake test households (safe dummy data)
+
+No seed data is included. Add your real family households via the UI (Submit New Household) or admin tools after setup.
 
 ### 4. Create your first Admin
 1. Register a new account via the web UI (`/register`).

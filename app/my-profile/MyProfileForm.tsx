@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
-import { submitCorrectionRequestAction } from '@/lib/actions/changeRequests';
+import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 
 interface Props {
@@ -40,7 +40,7 @@ export default function MyProfileForm({ initialData = {} }: Props) {
 
     const changes: Record<string, any> = {};
     Object.entries(formData).forEach(([k, v]) => {
-      if (v) changes[k] = v;
+      if (v !== undefined && v !== '') changes[k] = v;
     });
 
     if (Object.keys(changes).length === 0) {
@@ -49,18 +49,20 @@ export default function MyProfileForm({ initialData = {} }: Props) {
       return;
     }
 
-    const result = await submitCorrectionRequestAction({
-      target_table: 'persons',
-      target_record_id: initialData.id || '',
-      current_data: {},
-      proposed_data: { ...changes, _note: 'Self-submitted profile update via My Profile' },
-    });
+    // Direct update on own profile (RLS allows)
+    const supabase = createClient();
+    const { error } = await (supabase.from('profiles') as any)
+      .update({
+        full_name: changes.full_name,
+        mobile_number: changes.mobile_number,
+      })
+      .eq('id', initialData.id);
 
-    if (result.success) {
-      toast.success('Update request submitted. An admin will review it.');
-      router.push('/my-requests');
+    if (error) {
+      toast.error(error.message || 'Failed to update');
     } else {
-      toast.error(result.error || 'Failed to submit');
+      toast.success('Profile updated successfully.');
+      router.refresh();
     }
     setLoading(false);
   };
@@ -69,7 +71,7 @@ export default function MyProfileForm({ initialData = {} }: Props) {
     <div className="mx-auto max-w-xl px-6 py-8">
       <h1 className="font-serif text-2xl mt-3">My Profile</h1>
       <p className="text-muted mt-1 mb-6">
-        Update your own information. This will create a correction request for admin review (changes go live only after approval).
+        Update your basic profile information. Changes are saved immediately.
       </p>
 
       <form onSubmit={handleSubmit} className="card p-8 space-y-5">

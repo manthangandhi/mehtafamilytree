@@ -4,17 +4,28 @@ import Link from 'next/link';
 export default async function AdminOverview() {
   const adminClient = createAdminClient();
 
-  const [{ count: pendingUsers }, { count: pendingRequests }, { count: activeHouseholds }] = await Promise.all([
-    adminClient.from('profiles').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-    adminClient.from('change_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-    adminClient.from('households').select('*', { count: 'exact', head: true }).eq('status', 'active'),
-  ]);
+  let pendingUsers: number | null = null;
+  let pendingRequests: number | null = null;
+  let activeHouseholds: number | null = null;
+
+  try {
+    const [u, r, h] = await Promise.all([
+      adminClient.from('profiles').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+      adminClient.from('change_requests').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+      adminClient.from('households').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+    ]);
+    pendingUsers = u.count ?? null;
+    pendingRequests = r.count ?? null;
+    activeHouseholds = h.count ?? null;
+  } catch (e) {
+    console.warn('Admin overview stats failed (non-fatal):', e);
+  }
 
   return (
     <div className="p-8 max-w-6xl mx-auto animate-fade-in">
       <div className="mb-10">
         <h1 className="text-4xl font-serif font-bold tracking-tight text-foreground">Admin Dashboard</h1>
-        <p className="text-base text-muted mt-2">Manage the Mehta Kutumb family archive. All changes are securely audited.</p>
+        <p className="text-base text-muted mt-2">Manage registrations, life-event news, and directory governance. Registration approval required. After approval, members manage their own households directly (no further approvals needed).</p>
       </div>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
@@ -85,10 +96,23 @@ export default async function AdminOverview() {
         </div>
       </div>
 
-      <div className="mt-12 p-4 bg-surface/50 rounded-xl border border-border/50 flex items-start gap-3">
+      {/* Community News & Governance (Admin-Only) */}
+      <div className="mt-10">
+        <h2 className="text-xl font-serif font-semibold mb-3">Community News &amp; Directory Governance</h2>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 text-sm">
+          <Link href="/admin/announcements/new" className="card p-5 hover:border-primary/40">📣 Broadcast Life Events<br /><span className="text-xs text-muted">Births • Marriages • Obituaries/Shraddhanjali</span></Link>
+          <Link href="/admin/users" className="card p-5 hover:border-primary/40">👥 Registration Queue + Suspend<br /><span className="text-xs text-muted">Approve / Block / Make admin</span></Link>
+          <div className="card p-5 border-dashed">
+            Governance tools: Use profile status=blocked to suspend. Edit persons to redact contact fields (mobile/email). All writes audited.
+          </div>
+        </div>
+        <p className="text-xs text-muted mt-2">In-app notifications are sent on life event broadcasts. Full push (FCM/APNS) requires additional mobile setup.</p>
+      </div>
+
+      <div className="mt-8 p-4 bg-surface/50 rounded-xl border border-border/50 flex items-start gap-3">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
         <p className="text-sm text-muted">
-          All administrative actions are permanently recorded in the <Link href="/admin/audit-logs" className="text-primary hover:underline font-medium">audit log</Link> for accountability.
+          All administrative actions are permanently recorded in the <Link href="/admin/audit-logs" className="text-primary hover:underline font-medium">audit log</Link> for accountability. Members edit only their own data after approval.
         </p>
       </div>
     </div>

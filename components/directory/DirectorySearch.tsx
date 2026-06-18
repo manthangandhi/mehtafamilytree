@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 interface Props {
   initialFilters?: Record<string, string>;
@@ -20,6 +21,7 @@ const relationshipOptions = [
 ];
 
 export function DirectorySearch({ initialFilters = {} }: Props) {
+  const { t } = useLanguage();
   const router = useRouter();
 
   // Memoize stringified filters to avoid infinite useEffect loop (Bug fix #4)
@@ -101,7 +103,7 @@ export function DirectorySearch({ initialFilters = {} }: Props) {
       {/* Main search */}
       <div className="relative">
         <Input
-          placeholder="Search by name, place, or household..."
+          placeholder={t('searchPlaceholder') || 'Search by name, place, or household...'}
           value={filters.q}
           onChange={(e) => handleChange('q', e.target.value)}
           className="pl-10"
@@ -120,35 +122,35 @@ export function DirectorySearch({ initialFilters = {} }: Props) {
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>
         </svg>
-        {showAdvanced ? 'Hide advanced filters' : 'Show advanced filters'}
+        {showAdvanced ? 'Hide advanced filters' : t('showAdvanced') || 'Show advanced filters'}
       </button>
 
       {/* Advanced filters */}
       {showAdvanced && (
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 animate-fade-in border-t border-border/50 pt-4">
           <div>
-            <div className="text-sm text-foreground font-medium mb-1">City</div>
-            <Input value={filters.city} onChange={(e) => handleChange('city', e.target.value)} placeholder="City" />
+            <div className="text-sm text-foreground font-medium mb-1">{t('currentCity') || 'Current City'}</div>
+            <Input value={filters.city} onChange={(e) => handleChange('city', e.target.value)} placeholder={t('currentCity') || 'Current City'} />
           </div>
           <div>
-            <div className="text-sm text-foreground font-medium mb-1">State</div>
-            <Input value={filters.state} onChange={(e) => handleChange('state', e.target.value)} placeholder="State" />
+            <div className="text-sm text-foreground font-medium mb-1">{t('state') || 'State'}</div>
+            <Input value={filters.state} onChange={(e) => handleChange('state', e.target.value)} placeholder={t('state') || 'State'} />
           </div>
           <div>
-            <div className="text-sm text-foreground font-medium mb-1">Native place</div>
-            <Input value={filters.native_place} onChange={(e) => handleChange('native_place', e.target.value)} placeholder="Native place" />
+            <div className="text-sm text-foreground font-medium mb-1">{t('nativePlace') || 'Native place'}</div>
+            <Input value={filters.native_place} onChange={(e) => handleChange('native_place', e.target.value)} placeholder={t('nativePlace') || 'Native place'} />
           </div>
 
           <div>
-            <div className="text-sm text-foreground font-medium mb-1">Relationship to head</div>
+            <div className="text-sm text-foreground font-medium mb-1">{t('relationshipToHead') || 'Relationship to head'}</div>
             <Select value={filters.relationship} onChange={(e) => handleChange('relationship', e.target.value)} options={relationshipOptions} />
           </div>
           <div>
-            <div className="text-sm text-foreground font-medium mb-1">Marital status</div>
+            <div className="text-sm text-foreground font-medium mb-1">{t('maritalStatus') || 'Marital status'}</div>
             <Input value={filters.marital_status} onChange={(e) => handleChange('marital_status', e.target.value)} placeholder="married / single" />
           </div>
           <div>
-            <div className="text-sm text-foreground font-medium mb-1">Alive / Deceased</div>
+            <div className="text-sm text-foreground font-medium mb-1">{t('aliveDeceased') || 'Alive / Deceased'}</div>
             <Select
               value={filters.is_deceased}
               onChange={(e) => handleChange('is_deceased', e.target.value)}
@@ -163,14 +165,14 @@ export function DirectorySearch({ initialFilters = {} }: Props) {
       )}
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        <Button type="submit" variant="primary">Search Our Family</Button>
+        <Button type="submit" variant="primary">{t('searchOurFamily') || 'Search Our Family'}</Button>
         {hasActiveFilters && (
-          <Button type="button" variant="secondary" onClick={clear}>Clear all filters</Button>
+          <Button type="button" variant="secondary" onClick={clear}>{t('clearAllFilters') || 'Clear all filters'}</Button>
         )}
       </div>
 
       <p className="mt-3 text-xs text-foreground font-medium">
-        Privacy protected — full contact details are shown only to approved family members.
+        {t('privacyProtected') || 'Privacy protected — full contact details are shown only to approved family members.'}
       </p>
     </form>
   );

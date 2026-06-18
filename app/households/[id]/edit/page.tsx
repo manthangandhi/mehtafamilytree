@@ -3,10 +3,11 @@ import { notFound, redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentUserProfile } from '@/lib/auth/getCurrentUserProfile';
 import { getHouseholdMembers } from '@/lib/actions/persons';
-import { submitCorrectionRequestAction } from '@/lib/actions/changeRequests';
+import { updateMyHouseholdAction, addMembersToMyHouseholdAction, updateMyPersonAction } from '@/lib/actions/households';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
+import { AddHouseholdMemberForm } from '@/components/forms/AddHouseholdMemberForm';
 
 export default async function HouseholdEditPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -28,6 +29,18 @@ export default async function HouseholdEditPage({ params }: { params: Promise<{ 
 
   if (!household) notFound();
 
+  // Ownership OR admin override guard
+  const { data: fullH } = await (supabase.from('households') as any)
+    .select('created_by, owner_profile_id')
+    .eq('id', id)
+    .single();
+  const isOwner = fullH && (fullH.created_by === current.id || fullH.owner_profile_id === current.id);
+  const isAdmin = current.profile.role === 'admin';
+  if (!isOwner && !isAdmin) {
+    // Non-owners (non-admins) cannot edit other households
+    redirect(`/households/${id}`);
+  }
+
   const members = await getHouseholdMembers(id);
 
   return (
@@ -37,7 +50,11 @@ export default async function HouseholdEditPage({ params }: { params: Promise<{ 
           <div>
             <Link href={`/households/${id}`} className="text-sm text-muted hover:text-primary">← Back to household</Link>
             <h1 className="font-serif text-4xl font-semibold tracking-tight mt-2">Edit Household &amp; Members</h1>
-            <p className="text-muted mt-1">Update details for <span className="font-medium text-foreground">{household.primary_member_name}</span>. Changes are submitted for review and will be applied promptly.</p>
+            <p className="text-muted mt-1">
+              {isAdmin 
+                ? 'Admin override: You can edit any household or personal details.' 
+                : 'Update your household details and family members directly. Changes are live immediately.'}
+            </p>
           </div>
         </div>
 
@@ -57,16 +74,8 @@ export default async function HouseholdEditPage({ params }: { params: Promise<{ 
             notes: formData.get('notes') || undefined,
           };
 
-          // Submit as a structured correction for the household
-          await submitCorrectionRequestAction({
-            target_table: 'households',
-            target_record_id: id,
-            current_data: household || {},
-            proposed_data: updates,
-          });
-
-          // Also handle person updates below via separate calls in the client form if needed.
-          // For now the main household + we can enhance.
+          // DIRECT update (owner only)
+          await updateMyHouseholdAction(id, updates);
         }} className="card p-8 mb-8">
           <h2 className="font-semibold text-lg mb-6 flex items-center gap-2">Household Details</h2>
 
@@ -80,7 +89,7 @@ export default async function HouseholdEditPage({ params }: { params: Promise<{ 
               <Input name="native_place" defaultValue={household.native_place} />
             </div>
             <div>
-              <label className="label">City</label>
+              <label className="label">Current City</label>
               <Input name="city" defaultValue={household.city} />
             </div>
             <div>
@@ -145,12 +154,8 @@ export default async function HouseholdEditPage({ params }: { params: Promise<{ 
                   mobile_number: formData.get('mobile_number') || undefined,
                 };
 
-                await submitCorrectionRequestAction({
-                  target_table: 'persons',
-                  target_record_id: personId,
-                  current_data: p || {},
-                  proposed_data: changes,
-                });
+                // Direct owner update
+                await updateMyPersonAction(personId, changes);
               }} className="card p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="font-semibold text-lg">{p.full_name || 'Member'}</div>
@@ -202,115 +207,29 @@ export default async function HouseholdEditPage({ params }: { params: Promise<{ 
           )}
         </div>
 
-        {/* Add New Family Member - always scoped to this household */}
+        {/* Add New Family Member - consistent with admin: supports avatar, full fields, phone codes, repeater UX */}
         <div className="mt-8 card p-8 border border-accent/30">
           <h2 className="font-semibold text-lg mb-2">Add New Family Member to this Household</h2>
-          <p className="text-sm text-muted mb-6">This will be submitted as a pending request for admin review. It will be added directly to <span className="font-medium">{household.primary_member_name}</span>'s household.</p>
+          <p className="text-sm text-muted mb-6">Add a family member to <span className="font-medium">{household.primary_member_name}</span>'s household. Changes are live immediately. Supports avatar, country code phones and full details (same as admin experience).</p>
 
-          <form action={async (formData: FormData) => {
-            'use server';
-            const supabase = await createClient();
-            const userId = current?.profile?.id;
-
-            if (!userId) {
-              return;
-            }
-
-            const member = {
-              full_name: formData.get('full_name') as string,
-              relationship_to_head: formData.get('relationship_to_head') as string,
-              gender: formData.get('gender') as string || null,
-              date_of_birth: formData.get('date_of_birth') as string || null,
-              occupation: formData.get('occupation') as string || null,
-              education: formData.get('education') as string || null,
-              marital_status: formData.get('marital_status') as string || null,
-              mobile_number: formData.get('mobile_number') as string || null,
-              notes: formData.get('notes') as string || null,
-            };
-
-            if (!member.full_name || !member.relationship_to_head) {
-              // basic validation; in real would toast but server action limited here
-              return;
-            }
-
-            await (supabase.from('change_requests') as any).insert({
-              request_type: 'add_household_member',
-              target_table: 'household_members',
-              target_record_id: id,
-              submitted_by: userId,
-              status: 'pending',
-              proposed_data: {
-                household_id: id,
-                member: member,
-              },
-              current_data: null,
-              notes: `Add new member from household edit page`,
-            });
-          }} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="label text-xs">Full Name *</label>
-                <Input name="full_name" required placeholder="Full name" />
-              </div>
-              <div>
-                <label className="label text-xs">Relationship to Head *</label>
-                <select name="relationship_to_head" required className="input text-sm">
-                  <option value="">Select...</option>
-                  <option value="WIFE">Wife</option>
-                  <option value="HUSBAND">Husband</option>
-                  <option value="SON">Son</option>
-                  <option value="DAUGHTER">Daughter</option>
-                  <option value="FATHER">Father</option>
-                  <option value="MOTHER">Mother</option>
-                  <option value="BROTHER">Brother</option>
-                  <option value="SISTER">Sister</option>
-                  <option value="OTHER">Other</option>
-                </select>
-              </div>
-              <div>
-                <label className="label text-xs">Gender</label>
-                <select name="gender" className="input text-sm">
-                  <option value="">—</option>
-                  <option value="M">Male</option>
-                  <option value="F">Female</option>
-                  <option value="O">Other</option>
-                </select>
-              </div>
-              <div>
-                <label className="label text-xs">Date of Birth</label>
-                <Input name="date_of_birth" type="date" />
-              </div>
-              <div>
-                <label className="label text-xs">Occupation</label>
-                <Input name="occupation" />
-              </div>
-              <div>
-                <label className="label text-xs">Education</label>
-                <Input name="education" />
-              </div>
-              <div>
-                <label className="label text-xs">Marital Status</label>
-                <Input name="marital_status" />
-              </div>
-              <div>
-                <label className="label text-xs">Mobile</label>
-                <Input name="mobile_number" />
-              </div>
-              <div className="md:col-span-3">
-                <label className="label text-xs">Notes</label>
-                <Textarea name="notes" rows={2} />
-              </div>
-            </div>
-
-            <div className="flex gap-3 pt-2">
-              <Button type="submit" variant="primary" className="text-sm">Submit New Member for Review</Button>
-              <p className="text-[11px] text-muted self-center">Will be added to this household after admin approval.</p>
-            </div>
-          </form>
+          <AddHouseholdMemberForm
+            householdId={id}
+            householdName={household.primary_member_name}
+            onSubmitAction={async (payload: any) => {
+              'use server';
+              const member = payload.member || payload;
+              if (!member.full_name || !member.relationship_to_head) {
+                return { success: false, error: 'Name and relationship required' };
+              }
+              // Direct for owner
+              const res = await addMembersToMyHouseholdAction(id, [member]);
+              return res;
+            }}
+          />
         </div>
 
         <div className="mt-6 text-xs text-muted">
-          For complex relationships (e.g. wife of a child from previous marriage) or bulk adds, use the lineage tools or contact an admin after submitting the basic record.
+          Use the family tree tools for complex multi-generational relationships. All changes to your own household are immediate.
         </div>
       </div>
     </div>

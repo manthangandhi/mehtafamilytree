@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getCurrentUserProfile } from '@/lib/auth/getCurrentUserProfile';
+import { getMyHousehold } from '@/lib/actions/households';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { createClient } from '@/lib/supabase/server';
 import { format, isThisMonth, isThisWeek, parseISO, setYear, isAfter, isBefore, addDays } from 'date-fns';
@@ -69,42 +70,58 @@ export default async function DashboardPage() {
   let upcomingCelebrations: any[] = [];
   let recentUpdates: any[] = [];
   let announcements: any[] = [];
+  let myNotifications: any[] = [];
+
+  let myHousehold: any = null;
 
   if (isApproved) {
     const supabase = await createClient();
-    
-    // Fetch persons for birthdays
-    const { data: persons } = await supabase
-      .from('persons')
-      .select('id, full_name, date_of_birth, avatar_url')
-      .eq('is_deceased', false)
-      .not('date_of_birth', 'is', null);
 
-    // Fetch households for anniversaries
-    const { data: households } = await supabase
-      .from('households')
-      .select('id, primary_member_name, anniversary_date')
-      .not('anniversary_date', 'is', null);
+    try {
+      // Use safe member views (consistent with rest of app + already filtered)
+      const { data: persons } = await supabase
+        .from('member_persons_view')
+        .select('id, full_name, date_of_birth, avatar_url')
+        .eq('is_deceased', false)
+        .not('date_of_birth', 'is', null);
 
-    if (persons && households) {
-      upcomingCelebrations = getUpcomingCelebrations(persons, households);
+      const { data: households } = await supabase
+        .from('member_households_view')
+        .select('id, primary_member_name, anniversary_date')
+        .not('anniversary_date', 'is', null);
+
+      if (persons && households) {
+        upcomingCelebrations = getUpcomingCelebrations(persons, households);
+      }
+
+      myHousehold = await getMyHousehold();
+
+      // Recent updates (may be empty for non-admins due to RLS - handled in UI)
+      const { data: logs } = await supabase
+        .from('audit_logs')
+        .select('id, action_type, table_name, performed_by, performed_at')
+        .order('performed_at', { ascending: false })
+        .limit(5);
+      if (logs) recentUpdates = logs;
+
+      const { data: ann } = await supabase
+        .from('announcements')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(3);
+      if (ann) announcements = ann;
+
+      const { data: notifs } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('recipient_id', current.id)
+        .order('created_at', { ascending: false })
+        .limit(5);
+      if (notifs) myNotifications = notifs;
+    } catch (e) {
+      // Defensive: never let dashboard data fetches (missing cols, RLS, partial schema) produce Internal Server Error
+      console.warn('Dashboard data fetch failed (non-fatal):', e);
     }
-
-    // Fetch recent updates
-    const { data: logs } = await supabase
-      .from('audit_logs')
-      .select('id, action_type, table_name, performed_by, performed_at')
-      .order('performed_at', { ascending: false })
-      .limit(5);
-    if (logs) recentUpdates = logs;
-
-    // Fetch announcements
-    const { data: ann } = await supabase
-      .from('announcements')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(3);
-    if (ann) announcements = ann;
   }
 
   return (
@@ -202,6 +219,22 @@ export default async function DashboardPage() {
               </section>
             )}
 
+            {/* My Notifications (from admin broadcasts) */}
+            {isApproved && myNotifications.length > 0 && (
+              <section className="premium-card p-6 animate-fade-in">
+                <h3 className="font-semibold mb-3">Recent Notifications</h3>
+                <ul className="space-y-2 text-sm">
+                  {myNotifications.map((n: any) => (
+                    <li key={n.id} className="p-3 bg-surface-hover rounded border-l-2 border-accent/60">
+                      <div className="font-medium">{n.title}</div>
+                      <div className="text-xs text-muted line-clamp-1">{n.content}</div>
+                      <div className="text-[10px] text-muted mt-1">{new Date(n.created_at).toLocaleDateString()}</div>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
             {/* Quick Actions */}
             <section className="card p-6 animate-fade-in delay-2">
                <h2 className="text-lg font-semibold text-foreground mb-5">Quick Actions</h2>
@@ -226,6 +259,21 @@ export default async function DashboardPage() {
                       Add Household
                     </div>
                   </Link>
+                  {myHousehold ? (
+                    <Link href={`/households/${myHousehold.id}/edit`} className="group p-4 rounded-xl bg-surface-hover border border-border/50 hover:border-primary/30 transition-all">
+                      <div className="flex items-center gap-3 font-medium text-foreground group-hover:text-primary">
+                        <div className="p-2 bg-surface border border-border/50 rounded-lg shadow-sm text-primary"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+                        Manage My Household
+                      </div>
+                    </Link>
+                  ) : (
+                    <Link href="/submit/new-household" className="group p-4 rounded-xl bg-accent/10 border border-accent/30 hover:border-accent transition-all">
+                      <div className="flex items-center gap-3 font-medium text-foreground group-hover:text-accent">
+                        <div className="p-2 bg-surface border border-border/50 rounded-lg shadow-sm text-accent">🏠</div>
+                        Create My Household
+                      </div>
+                    </Link>
+                  )}
                   <Link href="/my-requests" className="group p-4 rounded-xl bg-surface-hover border border-border/50 hover:border-primary/30 transition-all">
                     <div className="flex items-center gap-3 font-medium text-foreground group-hover:text-primary">
                       <div className="p-2 bg-surface border border-border/50 rounded-lg shadow-sm text-primary"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/></svg></div>

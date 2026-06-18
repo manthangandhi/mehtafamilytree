@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Button } from '@/components/ui/Button';
 import { ImageUpload } from '@/components/ui/ImageUpload';
+import { PhoneInput } from '@/components/ui/PhoneInput';
 import { relationshipToHeadSchema } from '@/lib/validations/shared';
 import type { FamilyMemberRow } from '@/lib/validations/household';
 
@@ -69,9 +70,6 @@ export function FamilyMemberRepeater({ members, onChange, allowSelf = true }: Pr
     <div>
       <div className="mb-2 flex items-center justify-between">
         <div className="text-sm font-medium text-zinc-700">Family Members</div>
-        <Button type="button" variant="secondary" size="sm" onClick={addMember}>
-          + Add Family Member
-        </Button>
       </div>
 
       <div className="space-y-4">
@@ -83,6 +81,10 @@ export function FamilyMemberRepeater({ members, onChange, allowSelf = true }: Pr
 
         {members.map((m, idx) => {
           const isSelf = m.relationship_to_head === 'SELF';
+          const showSelfOption = allowSelf || isSelf;
+          const selectOptions = showSelfOption
+            ? relOptions
+            : relOptions.filter(o => o.value !== 'SELF');
           return (
             <div key={idx} className="repeater-row relative">
               <div className="md:col-span-2 lg:col-span-3">
@@ -119,7 +121,7 @@ export function FamilyMemberRepeater({ members, onChange, allowSelf = true }: Pr
                 label="Relationship to Head *"
                 value={m.relationship_to_head}
                 onChange={(e) => updateMember(idx, 'relationship_to_head', e.target.value as any)}
-                options={relOptions.filter(o => allowSelf || o.value !== 'SELF')}
+                options={selectOptions}
               />
 
               <Select
@@ -159,17 +161,16 @@ export function FamilyMemberRepeater({ members, onChange, allowSelf = true }: Pr
                 onChange={(e) => updateMember(idx, 'marital_status', e.target.value)}
               />
 
-              <Input
+              <PhoneInput
                 label="Mobile"
                 value={m.mobile_number || ''}
-                onChange={(e) => updateMember(idx, 'mobile_number', e.target.value)}
-                placeholder="+91 ..."
+                onChange={(val) => updateMember(idx, 'mobile_number', val)}
               />
 
-              <Input
+              <PhoneInput
                 label="WhatsApp"
                 value={m.whatsapp_number || ''}
-                onChange={(e) => updateMember(idx, 'whatsapp_number', e.target.value)}
+                onChange={(val) => updateMember(idx, 'whatsapp_number', val)}
               />
 
               <Input
@@ -210,6 +211,13 @@ export function FamilyMemberRepeater({ members, onChange, allowSelf = true }: Pr
           );
         })}
       </div>
+
+      <div className="mt-3 flex justify-center">
+        <Button type="button" variant="secondary" size="sm" onClick={addMember}>
+          + Add another family member
+        </Button>
+      </div>
+
       <p className="mt-2 text-xs text-muted">* Required fields. All changes submitted by members go through admin approval.</p>
     </div>
   );

@@ -7,8 +7,10 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { toast } from 'sonner';
+import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 function LoginForm() {
+  const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -32,7 +34,7 @@ function LoginForm() {
 
       // Special helpful message for the most common blocker
       if (msg.toLowerCase().includes('confirm') || msg.toLowerCase().includes('not confirmed')) {
-        setError('Email not confirmed yet. Please check your inbox (and spam), or use the resend button below.');
+        setError(t('emailNotConfirmed'));
       }
 
       setLoading(false);
@@ -67,7 +69,7 @@ function LoginForm() {
   return (
     <form onSubmit={handleLogin} className="card p-8 space-y-5">
       <Input
-        label="Email"
+        label={t('emailLabel')}
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
@@ -75,7 +77,7 @@ function LoginForm() {
         autoComplete="email"
       />
       <Input
-        label="Password"
+        label={t('passwordLabel')}
         type="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
@@ -90,7 +92,7 @@ function LoginForm() {
       )}
 
       <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? 'Signing in...' : 'Sign in'}
+        {loading ? t('signingIn') : t('signInBtn')}
       </Button>
 
       <div className="text-center">
@@ -100,7 +102,7 @@ function LoginForm() {
           disabled={resending || !email}
           className="text-sm text-foreground font-medium hover:text-primary underline underline-offset-2 disabled:opacity-50 transition-colors"
         >
-          {resending ? 'Resending...' : "Didn't receive confirmation email? Resend it"}
+          {resending ? 'Resending...' : t('resendConfirmation')}
         </button>
       </div>
     </form>

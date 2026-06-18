@@ -5,6 +5,37 @@ import { requireAdmin } from '@/lib/auth/requireAdmin';
 import { logAudit } from '@/lib/actions/audit';
 import { revalidatePath } from 'next/cache';
 
+async function broadcastLifeEventNotification(adminClient: any, announcement: any, adminId: string) {
+  // Fetch all approved members
+  const { data: profiles } = await adminClient
+    .from('profiles')
+    .select('id')
+    .eq('status', 'approved');
+
+  if (!profiles || profiles.length === 0) return;
+
+  const typeMap: Record<string, string> = {
+    birth: 'birth',
+    marriage: 'marriage',
+    death: 'death',
+    passing: 'death',
+    reunion: 'announcement',
+    general: 'general',
+  };
+  const notifType = typeMap[announcement.event_type] || 'general';
+
+  const inserts = profiles.map((p: any) => ({
+    recipient_id: p.id,
+    title: announcement.title,
+    content: announcement.content?.slice(0, 280) || '',
+    type: notifType,
+    related_table: 'announcements',
+    related_id: announcement.id,
+  }));
+
+  await adminClient.from('notifications').insert(inserts);
+}
+
 export async function createAnnouncement(formData: FormData) {
   try {
     const adminUser = await requireAdmin();
@@ -41,6 +72,13 @@ export async function createAnnouncement(formData: FormData) {
       new_data: data,
       performed_by: adminUser.id,
     });
+
+    // Broadcast in-app notifications to approved users (segmented push future)
+    try {
+      await broadcastLifeEventNotification(adminClient, data, adminUser.id);
+    } catch (e) {
+      console.warn('Notification broadcast failed (non-fatal)', e);
+    }
 
     revalidatePath('/announcements');
     revalidatePath('/dashboard');

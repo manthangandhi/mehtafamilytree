@@ -14,13 +14,14 @@ export default function NewCulturalPage() {
   const [category, setCategory] = useState('general');
   const [content, setContent] = useState('');
   const [visibility, setVisibility] = useState('public');
+  const [language, setLanguage] = useState('English');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const res = await createCulturalPageAction({ title, category, content, visibility_level: visibility });
+    const res = await createCulturalPageAction({ title, category, content, visibility_level: visibility, language });
     if (res.success) {
       toast.success('Page created');
       router.push('/admin/culture');
@@ -48,6 +49,14 @@ export default function NewCulturalPage() {
             <option value="public">public</option>
             <option value="members">members</option>
             <option value="admin">admin</option>
+          </select>
+        </div>
+        <div>
+          <label className="label">Language (affects speaker/voice)</label>
+          <select className="input" value={language} onChange={e=>setLanguage(e.target.value)}>
+            <option value="English">English</option>
+            <option value="Gujarati">Gujarati</option>
+            <option value="Hindi">Hindi</option>
           </select>
         </div>
         <Textarea 

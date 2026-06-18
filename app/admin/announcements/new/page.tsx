@@ -38,14 +38,16 @@ export default async function NewAnnouncement() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-muted mb-2">Event Type</label>
+          <label className="block text-sm font-medium text-muted mb-2">Category (Life Event / News)</label>
           <select name="event_type" required className="w-full bg-surface-hover border border-border/50 rounded-xl px-4 py-3 text-[15px] focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all appearance-none cursor-pointer">
             <option value="general">General Announcement</option>
-            <option value="birth">Birth</option>
-            <option value="marriage">Marriage</option>
-            <option value="passing">Passing</option>
-            <option value="reunion">Family Reunion</option>
+            <option value="birth">Birth Announcement</option>
+            <option value="marriage">Marriage / Wedding</option>
+            <option value="death">Death / Obituary / Shraddhanjali</option>
+            <option value="passing">Passing (Legacy)</option>
+            <option value="reunion">Family Reunion / Gathering</option>
           </select>
+          <p className="text-[11px] text-muted mt-1">Admins can broadcast verified life events to the community.</p>
         </div>
 
         <div>

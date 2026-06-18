@@ -1,14 +1,40 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
+import { calculateRelationship, getPersonName } from '@/lib/utils/kinship';
 
 interface FamilyTreeClientProps {
   treeData: any[];
+  allPersons?: any[];
+  allRelationships?: any[];
 }
 
-export default function FamilyTreeClient({ treeData }: FamilyTreeClientProps) {
+export default function FamilyTreeClient({ treeData, allPersons = [], allRelationships = [] }: FamilyTreeClientProps) {
   const [search, setSearch] = useState('');
+  const [personA, setPersonA] = useState('');
+  const [personB, setPersonB] = useState('');
+  const [relResult, setRelResult] = useState('');
+
+  // Flatten persons for calculator from treeData if not provided
+  const personsForCalc = useMemo(() => {
+    if (allPersons && allPersons.length > 0) return allPersons;
+    const map = new Map();
+    treeData.forEach((h: any) => {
+      (h.members || []).forEach((m: any) => {
+        const p = m.person || m;
+        if (p?.id) map.set(p.id, p);
+      });
+    });
+    return Array.from(map.values());
+  }, [treeData, allPersons]);
+
+  const relsForCalc = useMemo(() => {
+    if (allRelationships && allRelationships.length > 0) return allRelationships;
+    const out: any[] = [];
+    treeData.forEach((h: any) => (h.relationships || []).forEach((r: any) => out.push(r)));
+    return out;
+  }, [treeData, allRelationships]);
 
   const filtered = treeData.filter((unit: any) => {
     if (!search) return true;
@@ -18,6 +44,15 @@ export default function FamilyTreeClient({ treeData }: FamilyTreeClientProps) {
       unit.members?.some((m: any) => m.person?.full_name?.toLowerCase().includes(q))
     );
   });
+
+  const runRelationship = () => {
+    if (!personA || !personB) {
+      setRelResult('Select two people');
+      return;
+    }
+    const result = calculateRelationship(personA, personB, personsForCalc, relsForCalc);
+    setRelResult(result);
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-background pt-10">
@@ -43,6 +78,40 @@ export default function FamilyTreeClient({ treeData }: FamilyTreeClientProps) {
                     <input type="text" placeholder="e.g. Mehta..." className="input" value={search} onChange={(e) => setSearch(e.target.value)} />
                   </div>
                 </div>
+              </div>
+
+              {/* Relationship Path Calculator - Family Tree Building Engine feature */}
+              <div className="bg-surface rounded-xl border border-accent/40 p-6">
+                <h3 className="font-serif text-xl font-semibold mb-2">Relationship Calculator</h3>
+                <p className="text-xs text-muted mb-4">Select any two people to see their exact lineage connection (e.g. Second Cousin, Great Uncle). Powered by graph traversal.</p>
+
+                <div className="space-y-3">
+                  <div>
+                    <label className="label text-xs">Person A</label>
+                    <select className="input text-sm" value={personA} onChange={e => setPersonA(e.target.value)}>
+                      <option value="">-- select --</option>
+                      {personsForCalc.map((p: any) => (
+                        <option key={p.id} value={p.id}>{p.full_name || 'Unnamed'}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="label text-xs">Person B</label>
+                    <select className="input text-sm" value={personB} onChange={e => setPersonB(e.target.value)}>
+                      <option value="">-- select --</option>
+                      {personsForCalc.map((p: any) => (
+                        <option key={p.id} value={p.id}>{p.full_name || 'Unnamed'}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <button onClick={runRelationship} className="btn btn-primary w-full text-sm">Calculate Relationship</button>
+                  {relResult && (
+                    <div className="mt-2 p-3 rounded bg-accent/10 border border-accent/30 text-sm font-medium">
+                      {relResult}
+                    </div>
+                  )}
+                </div>
+                <p className="text-[10px] text-muted mt-3">Uses persons + relationships + father/mother/spouse columns.</p>
               </div>
               
               <div className="rounded-2xl border border-border/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-6 bg-primary text-white relative overflow-hidden">

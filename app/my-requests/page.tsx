@@ -16,7 +16,7 @@ export default async function MyRequestsPage() {
       <div className="mb-8">
         <h1 className="font-serif text-2xl">My Requests</h1>
         <p className="text-muted mt-2">
-          Track the status of your submitted requests.
+          Legacy requests (if any). For your own household &amp; family members, use "Manage My Household" — updates are now immediate with no admin approval required.
         </p>
       </div>
 

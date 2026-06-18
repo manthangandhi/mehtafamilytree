@@ -70,7 +70,7 @@ export default async function EditHousehold({ params }: { params: Promise<{ id: 
       <form action={handleUpdate} className="mt-6 card space-y-4 p-6">
         <Input name="primary_member_name" label="Primary Name" defaultValue={h.primary_member_name} />
         <Input name="household_code" label="Code" defaultValue={h.household_code || ''} />
-        <Input name="city" label="City" defaultValue={h.city || ''} />
+        <Input name="city" label="Current City" defaultValue={h.city || ''} />
         <Input name="state" label="State" defaultValue={h.state || ''} />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

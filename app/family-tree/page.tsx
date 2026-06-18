@@ -13,13 +13,14 @@ export default async function FamilyTreePage() {
 
   const supabase = await createClient();
 
-  const [{ data: households }, { data: householdMembers }, { data: relationships }] = await Promise.all([
+  const [{ data: households }, { data: householdMembers }, { data: relationships }, { data: allPersons }] = await Promise.all([
     supabase.from('member_households_view').select('*').eq('status', 'active').order('primary_member_name'),
-    supabase.from('household_members').select('*, person:persons(id, full_name, date_of_birth, is_deceased)').order('display_order'),
+    supabase.from('household_members').select('*, person:persons(*)').order('display_order'),
     supabase.from('relationships').select('*'),
+    supabase.from('persons').select('id, full_name, gender, father_id, mother_id, spouse_id, date_of_birth'),
   ]);
 
-  // Build the tree data server-side (same logic as before)
+  // Build the tree data server-side
   const treeData = (households || []).map((h: any) => {
     const members = (householdMembers || [])
       .filter((hm: any) => hm.household_id === h.id)
@@ -42,7 +43,7 @@ export default async function FamilyTreePage() {
       <div className="mx-auto max-w-6xl px-6 py-8">
 
 
-        <FamilyTreeClient treeData={treeData} />
+        <FamilyTreeClient treeData={treeData} allPersons={allPersons || []} allRelationships={relationships || []} />
 
         <div className="mt-10 text-center text-xs text-muted">
           Tree derived from household_members + relationships tables. 
