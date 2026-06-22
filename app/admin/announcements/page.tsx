@@ -13,11 +13,11 @@ export default async function AdminAnnouncements() {
     .order('created_at', { ascending: false });
 
   return (
-    <div className="p-8 animate-fade-in max-w-6xl mx-auto">
+    <div className="p-4 sm:p-8 lg:p-12 max-w-[1400px] mx-auto w-full animate-fade-in flex-grow flex flex-col">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
         <div>
-          <h1 className="text-4xl font-serif font-bold tracking-tight text-foreground">Announcements</h1>
-          <p className="text-base text-muted mt-2 max-w-xl">Manage family announcements, events, and news broadcasted to all members.</p>
+          <h1 className="text-3xl font-serif font-bold tracking-tight text-gray-800">Announcements</h1>
+          <p className="text-sm text-gray-500 mt-2 max-w-xl">Manage family announcements, events, and news broadcasted to all members.</p>
         </div>
         <Link href="/admin/announcements/new" className="bg-primary text-white shadow-lg hover:opacity-90 transition-all transform hover:-translate-y-px inline-flex items-center justify-center px-6 py-3 rounded-full font-sans text-sm font-semibold tracking-wide whitespace-nowrap">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
@@ -25,7 +25,7 @@ export default async function AdminAnnouncements() {
         </Link>
       </div>
 
-      <div className="bg-surface rounded-[2rem] border border-border/50 shadow-[0_10px_40px_-15px_rgba(141,79,17,0.1)] overflow-hidden">
+      <div className="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden flex-grow">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm whitespace-nowrap">
             <thead>

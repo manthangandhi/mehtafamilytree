@@ -5,13 +5,12 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Textarea } from '@/components/ui/Textarea';
+import { RichTextEditor } from '@/components/admin/RichTextEditor';
 import { createCulturalPageAction } from '@/lib/actions/culture';
 import { toast } from 'sonner';
 
 export default function NewCulturalPage() {
   const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('general');
   const [content, setContent] = useState('');
   const [visibility, setVisibility] = useState('public');
   const [language, setLanguage] = useState('English');
@@ -21,7 +20,7 @@ export default function NewCulturalPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const res = await createCulturalPageAction({ title, category, content, visibility_level: visibility, language });
+    const res = await createCulturalPageAction({ title, content, visibility_level: visibility, language });
     if (res.success) {
       toast.success('Page created');
       router.push('/admin/culture');
@@ -32,44 +31,96 @@ export default function NewCulturalPage() {
   };
 
   return (
-    <div className="mx-auto max-w-2xl px-6 py-8">
-      <Link href="/admin/culture">← Back</Link>
-      <h1 className="mt-2 text-xl font-semibold">New Cultural Page</h1>
-      <form onSubmit={handleSubmit} className="mt-6 card space-y-4 p-6">
-        <Input label="Title" value={title} onChange={e => setTitle(e.target.value)} required />
-        <div className="grid grid-cols-2 gap-4">
-          <select className="input" value={category} onChange={e=>setCategory(e.target.value)}>
-            <option value="history">history</option>
-            <option value="mataji_instructions">mataji_instructions</option>
-            <option value="gotra_guidance">gotra_guidance</option>
-            <option value="general">general</option>
-            <option value="special_note">special_note</option>
-          </select>
-          <select className="input" value={visibility} onChange={e=>setVisibility(e.target.value)}>
-            <option value="public">public</option>
-            <option value="members">members</option>
-            <option value="admin">admin</option>
-          </select>
-        </div>
+    <div className="p-6 sm:p-8 lg:p-10 max-w-[1100px] mx-auto w-full">
+      <div className="mb-6">
+        <Link 
+          href="/admin/culture" 
+          className="inline-flex items-center text-sm font-medium text-muted hover:text-primary transition-colors"
+        >
+          ← Back to Cultural Pages
+        </Link>
+      </div>
+
+      <div className="flex items-end justify-between mb-6">
         <div>
-          <label className="label">Language (affects speaker/voice)</label>
-          <select className="input" value={language} onChange={e=>setLanguage(e.target.value)}>
-            <option value="English">English</option>
-            <option value="Gujarati">Gujarati</option>
-            <option value="Hindi">Hindi</option>
-          </select>
+          <h1 className="text-3xl font-serif font-bold tracking-tight text-gray-800">New Cultural Page</h1>
+          <p className="text-muted mt-1">Create a new story, history, or guidance page for the family archive.</p>
         </div>
-        <Textarea 
-          label="Content (Markdown supported)" 
-          value={content} 
-          onChange={e=>setContent(e.target.value)} 
-          required 
-          className="min-h-[260px]" 
-        />
-        <p className="text-xs text-muted -mt-2">
-          Use **bold**, *italic*, - lists, [links](url), etc. Preview available on public view.
-        </p>
-        <Button type="submit" disabled={loading}>{loading ? 'Saving...' : 'Create Page'}</Button>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Main Form Card */}
+        <div className="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-8">
+          <div className="space-y-6">
+            {/* Title */}
+            <div>
+              <label className="block text-sm font-semibold text-foreground mb-2">Title</label>
+              <Input 
+                value={title} 
+                onChange={e => setTitle(e.target.value)} 
+                placeholder="e.g. The History of Our Gotra" 
+                required 
+                className="text-lg py-3"
+              />
+            </div>
+
+            {/* Visibility Row */}
+            <div>
+              <label className="block text-sm font-semibold text-foreground mb-2">Visibility</label>
+              <select 
+                className="input w-full" 
+                value={visibility} 
+                onChange={e => setVisibility(e.target.value)}
+              >
+                <option value="public">Public (anyone)</option>
+                <option value="members">Members only</option>
+                <option value="admin">Admins only</option>
+              </select>
+            </div>
+
+            {/* Language */}
+            <div className="max-w-xs">
+              <label className="block text-sm font-semibold text-foreground mb-2">
+                Language <span className="text-muted font-normal">(affects speaker / voice)</span>
+              </label>
+              <select 
+                className="input w-full" 
+                value={language} 
+                onChange={e => setLanguage(e.target.value)}
+              >
+                <option value="English">English</option>
+                <option value="Gujarati">Gujarati</option>
+                <option value="Hindi">Hindi</option>
+              </select>
+            </div>
+
+            {/* Rich Content Editor */}
+            <div>
+              <label className="block text-sm font-semibold text-foreground mb-2">
+                Content
+              </label>
+              <RichTextEditor 
+                value={content} 
+                onChange={setContent} 
+                placeholder="Begin writing the story, instructions, or history here. Use the toolbar above for rich formatting."
+              />
+              <p className="text-xs text-muted mt-2">
+                Use the toolbar for formatting. Your content will appear beautifully formatted on the public site.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex justify-end pt-2">
+          <Button 
+            type="submit" 
+            disabled={loading || !title.trim() || !content.trim()} 
+            className="px-8 py-2.5 text-base"
+          >
+            {loading ? 'Creating Page...' : 'Create Page'}
+          </Button>
+        </div>
       </form>
     </div>
   );

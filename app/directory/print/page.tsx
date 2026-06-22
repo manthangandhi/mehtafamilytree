@@ -107,7 +107,7 @@ export default async function PrintDirectoryPage() {
               {(culturalPages as any[]).map((page: any) => (
                 <div key={page.id} className="avoid-break mb-12">
                   <h2 className="text-3xl font-bold mb-2 text-primary">{page.title}</h2>
-                  <div className="text-xs uppercase tracking-widest text-muted mb-6 font-sans">{page.category} • {page.language}</div>
+                  <div className="text-xs uppercase tracking-widest text-muted mb-6 font-sans">{page.language}</div>
                   <div className="prose-heritage max-w-none text-justify leading-relaxed" dangerouslySetInnerHTML={{ __html: page.content || '' }} />
                 </div>
               ))}

@@ -14,15 +14,16 @@ export default async function AdminHouseholds() {
     .order('created_at', { ascending: false });
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-8 lg:p-12 max-w-[1400px] mx-auto w-full animate-fade-in flex-grow flex flex-col">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Households</h1>
+        <h1 className="text-3xl font-serif font-bold tracking-tight text-gray-800">Households</h1>
         <Link href="/admin/households/new">
-          <Button>+ New Household</Button>
+          <Button>Create Household</Button>
         </Link>
       </div>
 
-      <div className="card overflow-hidden">
+      <div className="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden flex-grow">
+        <div className="overflow-x-auto p-2">
         <table className="table">
           <thead>
             <tr>
@@ -58,6 +59,7 @@ export default async function AdminHouseholds() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

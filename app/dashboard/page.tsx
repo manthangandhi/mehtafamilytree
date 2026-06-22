@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { getCurrentUserProfile } from '@/lib/auth/getCurrentUserProfile';
 import { getMyHousehold } from '@/lib/actions/households';
 import { StatusBadge } from '@/components/ui/StatusBadge';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { createClient } from '@/lib/supabase/server';
 import { format, isThisMonth, isThisWeek, parseISO, setYear, isAfter, isBefore, addDays } from 'date-fns';
 import Image from 'next/image';
@@ -53,6 +54,8 @@ function getUpcomingCelebrations(persons: any[], households: any[]) {
 
   return celebrations.sort((a, b) => a.date.getTime() - b.date.getTime()).slice(0, 5);
 }
+
+import { FloralBackground } from '@/components/ui/FloralBackground';
 
 export default async function DashboardPage() {
   const current = await getCurrentUserProfile();
@@ -125,58 +128,68 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-10">
+    <div className="min-h-screen bg-background flex flex-col font-sans">
+      
+      {/* Primary Brand Header Banner */}
+      <div className="bg-gradient-to-r from-primary via-[#114536] to-primary text-white shadow-md relative overflow-hidden">
+        <FloralBackground opacity="0.10" />
         
-        {/* Welcome Header */}
-        <div className="mb-10 animate-fade-in flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3 flex-wrap mb-1">
-              <h1 className="text-3xl font-bold tracking-tight text-foreground">Welcome, {profile.full_name || 'Family Member'}</h1>
-              <StatusBadge status={profile.status} />
-              {profile.role === 'admin' && <StatusBadge status="admin" />}
+        <div className="mx-auto max-w-[95%] xl:max-w-[1400px] px-6 py-10 relative z-10">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+              <div className="flex items-center gap-3 flex-wrap mb-2">
+                <h1 className="font-serif text-4xl md:text-5xl font-extrabold text-white drop-shadow-md">
+                  Welcome, {profile.full_name || 'Family Member'}
+                </h1>
+                <StatusBadge status={profile.status} variant="light" />
+                {profile.role === 'admin' && <StatusBadge status="admin" variant="light" />}
+              </div>
+              <p className="text-[17px] text-white/90 font-medium drop-shadow-sm">Your Mehta Kutumb family hub</p>
             </div>
-            <p className="text-[15px] text-muted">Your Mehta Kutumb family hub</p>
-          </div>
-          <div className="flex flex-wrap gap-3 mt-4 md:mt-0">
-            <Link href="/directory/print" className="btn btn-secondary">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
-              Print Family Record
-            </Link>
-            <Link href="/announcements" className="btn btn-primary">
-              View Announcements
-            </Link>
+            <div className="flex flex-wrap gap-3 mt-4 md:mt-0">
+              <Link href="/directory/print" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border border-white/20 shadow-lg px-6 py-2.5 rounded-full font-bold transition-all text-sm backdrop-blur-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+                Print Family Record
+              </Link>
+              <Link href="/announcements" className="inline-flex items-center gap-2 bg-white text-primary hover:bg-gray-50 border border-transparent shadow-lg px-6 py-2.5 rounded-full font-bold transition-transform hover:scale-105 active:scale-95 text-sm">
+                View Announcements
+              </Link>
+            </div>
           </div>
         </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="mx-auto max-w-[95%] xl:max-w-[1400px] w-full flex-grow px-6 py-10">
 
         {/* Status Alerts */}
         {!emailConfirmed && (
-          <div className="card mb-8 border-accent/30 bg-accent/5 p-5 animate-fade-in">
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 mt-0.5">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent">
+          <div className="premium-card p-6 mb-8 border-l-4 border-l-amber-500 animate-fade-in">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0 mt-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-500">
                   <circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>
                 </svg>
               </div>
               <div>
-                <div className="font-semibold text-accent text-[15px]">Confirm your email address</div>
-                <p className="mt-1 text-sm text-accent">Check your inbox for the confirmation link to fully unlock your account.</p>
+                <div className="font-serif text-xl font-bold text-foreground">Confirm your email address</div>
+                <p className="mt-1 text-[15px] text-muted">Check your inbox for the confirmation link to fully unlock your account.</p>
               </div>
             </div>
           </div>
         )}
 
         {isPending && (
-          <div className="card mb-8 border-primary/30 bg-primary/5 p-5 animate-fade-in">
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 mt-0.5">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+          <div className="premium-card p-6 mb-8 border-l-4 border-l-primary bg-primary/5 animate-fade-in">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0 mt-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
                   <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
                 </svg>
               </div>
               <div>
-                <div className="font-semibold text-primary text-[15px]">Account awaiting approval</div>
-                <p className="mt-1 text-sm text-primary">An admin will review your account shortly. You can browse public records in the meantime.</p>
+                <div className="font-serif text-xl font-bold text-primary">Account awaiting approval</div>
+                <p className="mt-1 text-[15px] text-primary/80">An admin will review your account shortly. You can browse public records in the meantime.</p>
               </div>
             </div>
           </div>
@@ -212,9 +225,7 @@ export default async function DashboardPage() {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-10 bg-surface-hover rounded-xl border border-dashed border-border">
-                    <p className="text-muted text-sm">No recent announcements to display.</p>
-                  </div>
+                  <EmptyState title="No recent announcements" description="Check back later for updates from the family." />
                 )}
               </section>
             )}
@@ -312,9 +323,7 @@ export default async function DashboardPage() {
                     ))}
                   </ul>
                 ) : (
-                  <div className="text-center py-8 bg-surface-hover rounded-xl border border-dashed border-border">
-                    <p className="text-muted text-sm">No celebrations in the next 30 days.</p>
-                  </div>
+                  <EmptyState title="No upcoming celebrations" description="No birthdays or anniversaries in the next 30 days." />
                 )}
               </section>
             )}
@@ -340,9 +349,7 @@ export default async function DashboardPage() {
                     })}
                   </ul>
                 ) : (
-                  <div className="text-center py-8 bg-surface-hover rounded-xl border border-dashed border-border">
-                    <p className="text-muted text-sm">No recent updates.</p>
-                  </div>
+                  <EmptyState title="No recent updates" description="The directory is quiet right now." />
                 )}
               </section>
             )}

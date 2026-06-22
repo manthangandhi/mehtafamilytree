@@ -70,7 +70,7 @@ This model supports traditional single-head households as well as more complex m
 - Household management: Create full households with repeater (auto-creates persons, members, and relationships including mother links). Edit basic fields + add missed family members directly in the edit screen (reuses the same rich repeater). Deactivate (soft delete).
 - Persons: View and edit individual rich details.
 - Change Requests: Full review queue with comparison view (current vs proposed). Approve applies changes live + creates audit. Reject with reason (visible to submitter). All request types supported for core flows.
-- Cultural Pages: Full CRUD with Markdown formatting (title, category, language, visibility). Changes immediately available to the right audiences (public/members/admin).
+- Cultural Pages: Full CRUD with rich text editor (title, language, visibility). Changes immediately available to the right audiences (public/members/admin).
 - Audit Logs: Complete read-only history of every privileged action (who did what, when, old/new data).
 - Overview dashboard with quick counts (pending users, pending requests, active households).
 

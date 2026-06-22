@@ -5,6 +5,7 @@ import { getCurrentUserProfile } from '@/lib/auth/getCurrentUserProfile';
 import { PrivacyField } from '@/components/ui/PrivacyField';
 import { getHouseholdMembers } from '@/lib/actions/persons';
 import { FamilyMembersTable } from '@/components/household/FamilyMembersTable';
+import { FloralBackground } from '@/components/ui/FloralBackground';
 
 export default async function HouseholdDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -79,110 +80,144 @@ export default async function HouseholdDetailPage({ params }: { params: Promise<
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-7xl px-6 py-8 relative household-detail-enhanced bg-[radial-gradient(#e6dfd4_0.6px,transparent_0.6px)] bg-[length:22px_22px]">
-
-        {/* Breadcrumb */}
-        <nav className="mb-6 flex items-center gap-2 text-sm text-muted/90 animate-fade-in">
-          <Link href="/directory" className="hover:text-primary transition-colors font-medium">Households</Link>
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted/60">
-            <path d="m9 18 6-6-6-6"/>
-          </svg>
-          <span className="text-muted font-medium truncate max-w-[200px]">{household.primary_member_name}</span>
-        </nav>
-
-        <div className="mb-6 animate-fade-in">
-          <div className="flex items-start gap-4 relative">
-            <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-3xl bg-primary/5 text-primary border border-border/70 ring-1 ring-inset ring-border/40 shadow-sm transition-all">
-              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
-              </svg>
-            </div>
-            <div>
-              <h1 className="font-serif text-4xl font-semibold tracking-[-0.025em] text-foreground">{household.primary_member_name}</h1>
-              <div className="mt-1 text-[15px] text-muted flex items-center gap-1.5">
-                <span>{[household.native_place, household.city, household.state, household.country].filter(Boolean).join(', ')}</span>
-              </div>
-              {household.verified && (
-                <span className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-3.5 py-0.5 text-xs font-semibold tracking-[0.5px] text-primary border border-accent/30">
-                  <span className="text-accent">◆</span> VERIFIED FAMILY RECORD
-                </span>
-              )}
-            </div>
+    <div className="min-h-screen bg-background flex flex-col font-sans">
+      {/* Green edge-to-edge header — exactly matching the directory and other pages */}
+      <div className="bg-gradient-to-r from-primary via-[#114536] to-primary text-white shadow-md relative overflow-hidden">
+        <FloralBackground opacity="0.10" />
+        
+        <div className="mx-auto max-w-[95%] xl:max-w-[1400px] px-6 py-10 relative z-10">
+          {/* Small back link for consistency */}
+          <div className="-mt-2 mb-3">
+            <Link href="/directory" className="inline-flex items-center gap-1 text-xs text-white/70 hover:text-white font-medium">
+              ← Back to Households
+            </Link>
           </div>
-        </div>
 
-        <div className="flex flex-col gap-8">
-          {/* Contact section */}
-          <div className="animate-fade-in delay-1">
-            <div className="bg-surface card p-6 border border-border/70 shadow-[0_14px_52px_-13px_rgb(0,0,0,0.075)] relative overflow-hidden">
-              <div className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary/70">
-                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="flex items-start gap-6">
+              <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-2xl bg-white text-primary shadow-xl border border-white/20">
+                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
                 </svg>
-                Contact Information
               </div>
-              {/* Accent divider with stronger gold for vivid pop and elegant separation (tiny polish) */}
-              <div className="h-px bg-gradient-to-r from-accent/40 via-border/55 to-transparent mb-5 -mx-1" />
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
-                {contactFields.map((field) => (
-                  <div key={field.label} className="flex items-start gap-2.5 p-2 -m-1 rounded-xl hover:bg-surface-hover/60 transition-all group">
-                    <span className="mt-0.5 text-muted flex-shrink-0 group-hover:text-primary transition-colors">{field.icon}</span>
-                    <div>
-                      <div className="text-xs text-muted mb-0.5 tracking-wide">{field.label}</div>
-                      <PrivacyField value={field.value} isApproved={isApproved} />
-                    </div>
+              <div className="max-w-xl">
+                <h1 className="font-serif text-4xl md:text-5xl font-extrabold text-white mb-1 drop-shadow-md">
+                  {household.primary_member_name}
+                </h1>
+                <p className="text-[16px] text-white/90 font-medium drop-shadow-sm">
+                  {[household.native_place, household.city, household.state, household.country].filter(Boolean).join(', ') || '—'}
+                </p>
+                {household.verified && (
+                  <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-0.5 text-xs font-semibold text-white border border-white/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                    Verified Record
                   </div>
-                ))}
+                )}
               </div>
-
-              {!isApproved && (
-                <div className="mt-5 rounded-2xl bg-accent/5 border border-accent/20 p-3.5 text-xs text-foreground/80">
-                  <div className="flex items-start gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0 mt-0.5 text-accent">
-                      <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                    </svg>
-                    <span>Sign in with an approved account to view full contact details and family links.</span>
-                  </div>
-                </div>
-              )}
             </div>
 
-            {household.notes && isApproved && (
-              <div className="mt-4 bg-surface card p-5 text-sm animate-fade-in delay-2 border border-border/70 relative overflow-hidden shadow-[0_12px_46px_-14px_rgb(0,0,0,0.065)]">
-                <div className="mb-2 text-xs font-semibold text-muted flex items-center gap-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary/70">
-                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/>
-                  </svg>
-                  Notes
+            {/* Prominent actions on the right (white buttons like directory submit) */}
+            <div className="flex flex-wrap items-center gap-2 md:gap-3">
+              {isApproved && (
+                <Link
+                  href={`/submit/correction?household=${id}`}
+                  className="text-sm text-white/90 hover:text-white underline underline-offset-2 px-2 py-1 whitespace-nowrap"
+                >
+                  Suggest correction
+                </Link>
+              )}
+              {canEdit && (
+                <Link
+                  href={`/households/${id}/edit`}
+                  className="inline-flex items-center gap-2 bg-white text-primary hover:bg-gray-50 border border-transparent shadow-lg px-5 py-2.5 rounded-full font-bold transition-transform hover:scale-[1.02] active:scale-[0.985] text-sm whitespace-nowrap"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                  {isAdmin ? 'Edit (Admin)' : 'Edit'}
+                </Link>
+              )}
+              {canEdit && (
+                <Link
+                  href={`/households/${id}/edit`}
+                  className="text-sm text-white/90 hover:text-white font-medium px-2 py-1 whitespace-nowrap"
+                  title="Add a new member to this household"
+                >
+                  + Add member
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Content area below green header (matches directory page structure) */}
+      <div className="mx-auto max-w-[95%] xl:max-w-[1400px] px-6 w-full flex-grow py-8">
+
+        {/* Contact Details */}
+        <div className="premium-card p-8 md:p-10 mb-8">
+          <h2 className="mb-6 text-xl font-serif font-bold text-gray-800 flex items-center gap-3">
+            <span className="w-1.5 h-6 bg-amber-400 rounded-full"></span>
+            Contact Details
+          </h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
+            {contactFields.map((field) => (
+              <div key={field.label} className="min-w-0">
+                <div className="flex items-center gap-2 text-[10px] uppercase tracking-[1.5px] font-medium text-muted mb-1.5">
+                  <span className="text-muted/70">{field.icon}</span>
+                  <span>{field.label}</span>
                 </div>
-                <p className="text-muted leading-relaxed">{household.notes}</p>
+                <div className="text-[15px] leading-snug text-foreground font-medium break-words">
+                  <PrivacyField value={field.value} isApproved={isApproved} />
+                </div>
               </div>
-            )}
+            ))}
           </div>
 
-          {/* Family Members */}
-          <div className="animate-fade-in delay-2">
-            <FamilyMembersTable
-              members={members}
-              relationships={relationships}
-              isApproved={isApproved}
-              isAdmin={!!current?.profile && current.profile.role === 'admin'}
-              canEdit={canEdit}
-              householdId={id}
-            />
-          </div>
+          {!isApproved && (
+            <div className="mt-8 text-sm bg-surface-hover border border-border/60 rounded-2xl p-5 text-muted">
+              Full contact details are available to approved family members only.{' '}
+              <Link href="/login" className="text-primary underline">Sign in</Link> with an approved account.
+            </div>
+          )}
+
+          {/* Notes (if any) integrated here for approved users */}
+          {household.notes && isApproved && (
+            <div className="mt-8 pt-6 border-t border-border/50">
+              <div className="text-[10px] uppercase tracking-[1.5px] font-medium text-muted mb-2 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                NOTES
+              </div>
+              <p className="text-[14px] text-muted leading-relaxed">{household.notes}</p>
+            </div>
+          )}
         </div>
 
-        <div className="mt-8 text-center animate-fade-in delay-3">
-          <Link href="/directory" className="text-sm text-muted hover:text-primary transition-all inline-flex items-center gap-1.5 group py-1 px-2 rounded-full hover:bg-surface-hover/60">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:-translate-x-0.5 transition-transform">
-              <path d="m15 18-6-6 6-6"/>
-            </svg>
-            Back to all households
-          </Link>
+        {/* Family Members - full width, vertical presentation, no horizontal table */}
+        <div className="premium-card p-8 md:p-10">
+          <div className="mb-5">
+            <div className="text-xl font-serif font-bold text-gray-800 flex items-center gap-3">
+              <span className="w-1.5 h-6 bg-emerald-400 rounded-full"></span>
+              {isApproved ? `Family Members (${members.length})` : 'Primary Member'}
+            </div>
+          </div>
+
+          <FamilyMembersTable
+            members={members}
+            relationships={relationships}
+            isApproved={isApproved}
+            isAdmin={isAdmin}
+            canEdit={canEdit}
+            householdId={id}
+          />
         </div>
+
+      </div>
+
+      {/* Consistent privacy footer note like other pages */}
+      <div className="bg-amber-50 py-5 border-t border-amber-100 mt-auto">
+        <p className="text-center text-sm text-amber-800 font-medium px-6">
+          <span className="font-bold">Privacy Note:</span> Full addresses, phone numbers, and emails are exclusively visible to approved family members.
+        </p>
       </div>
     </div>
   );

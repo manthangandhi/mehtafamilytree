@@ -19,6 +19,7 @@ interface Props {
   submitLabel?: string;
   isSubmitting?: boolean;
   mode?: 'admin' | 'member-request';
+  onCancel?: () => void;
 }
 
 export function HouseholdForm({
@@ -30,6 +31,7 @@ export function HouseholdForm({
   submitLabel = 'Save Household',
   isSubmitting,
   mode = 'admin',
+  onCancel,
 }: Props) {
   const { t } = useLanguage();
   const updateH = (field: keyof HouseholdFormData, value: any) => {
@@ -112,6 +114,11 @@ export function HouseholdForm({
       </div>
 
       <div className="flex justify-end gap-3 pt-2">
+        {onCancel && (
+          <Button type="button" variant="secondary" onClick={onCancel} disabled={isSubmitting}>
+            Cancel
+          </Button>
+        )}
         <Button type="submit" variant="primary" disabled={isSubmitting}>
           {isSubmitting ? 'Saving...' : submitLabel}
         </Button>

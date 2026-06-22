@@ -310,7 +310,6 @@ export interface Database {
         Row: {
           id: string;
           title: string;
-          category: string;
           content: string;
           language: string;
           visibility_level: 'public' | 'members' | 'admin';
@@ -322,7 +321,6 @@ export interface Database {
         Insert: {
           id?: string;
           title: string;
-          category: string;
           content: string;
           language?: string;
           visibility_level?: 'public' | 'members' | 'admin';
@@ -333,7 +331,6 @@ export interface Database {
         };
         Update: {
           title?: string;
-          category?: string;
           content?: string;
           language?: string;
           visibility_level?: 'public' | 'members' | 'admin';

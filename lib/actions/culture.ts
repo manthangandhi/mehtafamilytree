@@ -15,7 +15,7 @@ export async function getCulturalPages(visibilityFor: 'public' | 'member' = 'pub
 
   let query = supabase
     .from('cultural_pages')
-    .select('id, title, category, language, visibility_level, created_at')
+    .select('id, title, language, visibility_level, created_at')
     .order('created_at', { ascending: false });
 
   if (visibilityFor === 'public') {

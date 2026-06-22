@@ -26,7 +26,7 @@ export function RequestComparisonView({ current, proposed }: Props) {
   const keys = Array.from(new Set([...Object.keys(current || {}), ...Object.keys(proposed || {})]));
 
   return (
-    <div className="rounded-lg border bg-surface p-4">
+    <div className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm">
       <div className="mb-3 grid grid-cols-3 gap-3 text-xs font-semibold uppercase tracking-widest text-muted">
         <div>Field</div>
         <div>Current</div>

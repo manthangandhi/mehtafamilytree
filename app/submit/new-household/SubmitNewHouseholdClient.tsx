@@ -27,6 +27,8 @@ const emptyHousehold: HouseholdFormData = {
   status: 'active',
 };
 
+import { PageHeader } from '@/components/ui/PageHeader';
+
 export default function SubmitNewHouseholdClient() {
   const [household, setHousehold] = useState<HouseholdFormData>(emptyHousehold);
   const [members, setMembers] = useState<FamilyMemberRow[]>([
@@ -58,23 +60,29 @@ export default function SubmitNewHouseholdClient() {
   };
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-8">
-      <div className="mb-8">
-        <h1 className="font-serif text-2xl">Add Your Household</h1>
-        <p className="text-muted mt-2">Create and manage your own household record. Include the primary head as SELF. Changes are live immediately. You can only manage your own household.</p>
-      </div>
-
-      <div className="mt-6">
-        <HouseholdForm
-          household={household}
-          members={members}
-          onHouseholdChange={setHousehold}
-          onMembersChange={setMembers}
-          onSubmit={handleSubmit}
-          submitLabel="Create My Household"
-          isSubmitting={submitting}
-          mode="member-request"
-        />
+    <div className="min-h-screen bg-background flex flex-col font-sans">
+      <PageHeader 
+        title="Add Your Household"
+        description="Create and manage your own household record. Include the primary head as SELF. Changes are live immediately. You can only manage your own household."
+        icon={
+          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        }
+      />
+      
+      <div className="mx-auto max-w-[95%] xl:max-w-[1400px] px-6 w-full flex-grow py-10">
+        <div className="premium-card p-8 md:p-10 max-w-4xl mx-auto">
+          <HouseholdForm
+            household={household}
+            members={members}
+            onHouseholdChange={setHousehold}
+            onMembersChange={setMembers}
+            onSubmit={handleSubmit}
+            submitLabel="Create My Household"
+            isSubmitting={submitting}
+            mode="member-request"
+            onCancel={() => router.push('/dashboard')}
+          />
+        </div>
       </div>
     </div>
   );

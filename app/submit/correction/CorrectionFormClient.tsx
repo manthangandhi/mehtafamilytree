@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/Textarea';
 import { submitCorrectionRequestAction } from '@/lib/actions/changeRequests';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
+import { PageHeader } from '@/components/ui/PageHeader';
 
 function InnerCorrectionForm() {
   const router = useRouter();
@@ -174,17 +175,22 @@ function InnerCorrectionForm() {
 
 export default function CorrectionFormClient() {
   return (
-    <div className="max-w-2xl mx-auto px-6 py-12 animate-fade-in">
-      <div className="mb-8">
-        <h1 className="font-serif text-3xl font-bold text-foreground">Suggest a Correction</h1>
-        <p className="text-muted mt-2 text-sm">
-          Notice an error in a family member's details? Submit the correct information below. An administrator will review your changes before they go live. You only need to fill in the fields that require correcting.
-        </p>
+    <div className="min-h-screen bg-background flex flex-col font-sans">
+      <PageHeader 
+        title="Suggest a Correction"
+        description="Notice an error in a family member's details? Submit the correct information below. An administrator will review your changes before they go live."
+        icon={
+          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"/></svg>
+        }
+      />
+      
+      <div className="mx-auto max-w-[95%] xl:max-w-[1400px] px-6 w-full flex-grow py-10">
+        <div className="premium-card p-8 md:p-10 max-w-2xl mx-auto animate-fade-in">
+          <Suspense fallback={<div className="animate-pulse h-64 bg-surface rounded-xl"></div>}>
+            <InnerCorrectionForm />
+          </Suspense>
+        </div>
       </div>
-
-      <Suspense fallback={<div className="animate-pulse h-64 bg-surface rounded-xl"></div>}>
-        <InnerCorrectionForm />
-      </Suspense>
     </div>
   );
 }

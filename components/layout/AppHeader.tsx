@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Menu, X } from "lucide-react";
+import { GoogleTranslate } from "@/components/ui/GoogleTranslate";
 import { useLanguage, type Lang } from "@/lib/i18n/LanguageContext";
 
 export function AppHeader() {
@@ -142,18 +143,9 @@ export function AppHeader() {
             </Link>
           )}
 
-          {/* Language switcher */}
-          <div className="hidden sm:flex items-center gap-0.5 text-[10px] border border-border rounded-full p-0.5 bg-surface/60">
-            {(['en','gu','hi'] as Lang[]).map(l => (
-              <button
-                key={l}
-                onClick={() => setLang(l)}
-                className={`px-1.5 py-0.5 rounded-full transition ${lang === l ? 'bg-primary text-white' : 'hover:bg-surface-hover text-muted'}`}
-                title={l === 'en' ? 'English' : l === 'gu' ? 'ગુજરાતી' : 'हिन्दी'}
-              >
-                {l === 'en' ? 'EN' : l === 'gu' ? 'ગુ' : 'हि'}
-              </button>
-            ))}
+          {/* Google Translate Widget */}
+          <div className="hidden sm:flex">
+            <GoogleTranslate />
           </div>
 
           {/* Mobile Menu Toggle */}
@@ -185,17 +177,8 @@ export function AppHeader() {
                 <Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="py-1.5 font-serif font-medium text-primary">{t('admin')}</Link>
               )}
               <div className="my-1 border-t border-border" />
-              {/* Mobile lang compact */}
               <div className="flex gap-1 text-xs py-1">
-                {(['en','gu','hi'] as Lang[]).map(l => (
-                  <button 
-                    key={l} 
-                    onClick={() => { setLang(l); setMobileMenuOpen(false); }} 
-                    className={`px-2 py-0.5 rounded transition ${lang===l ? 'bg-primary text-white' : 'border border-border hover:bg-surface-hover'}`}
-                  >
-                    {l==='en'?'EN':l==='gu'?'ગુ':'हि'}
-                  </button>
-                ))}
+                <GoogleTranslate />
               </div>
               {userState ? (
                 <>

@@ -4,6 +4,7 @@ import { getCurrentUserProfile } from '@/lib/auth/getCurrentUserProfile';
 import { redirect } from 'next/navigation';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { PageHeader } from '@/components/ui/PageHeader';
 
 export default async function MyRequestsPage() {
   const current = await getCurrentUserProfile();
@@ -12,17 +13,20 @@ export default async function MyRequestsPage() {
   const requests = await getMyChangeRequests();
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-8">
-      <div className="mb-8">
-        <h1 className="font-serif text-2xl">My Requests</h1>
-        <p className="text-muted mt-2">
-          Legacy requests (if any). For your own household &amp; family members, use "Manage My Household" — updates are now immediate with no admin approval required.
-        </p>
-      </div>
-
-      {requests.length === 0 && (
-        <EmptyState title="No requests yet" description="Submit a new household, correction, or mark-deceased request from your dashboard." />
-      )}
+    <div className="min-h-screen bg-background flex flex-col font-sans">
+      <PageHeader 
+        title="My Requests"
+        description="Legacy requests (if any). For your own household & family members, use 'Manage My Household' — updates are now immediate with no admin approval required."
+        icon={
+          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="m9 15 3 3 3-3"/></svg>
+        }
+      />
+      
+      <div className="mx-auto max-w-[95%] xl:max-w-[1400px] px-6 w-full flex-grow py-10">
+        <div className="premium-card p-8 md:p-10">
+          {requests.length === 0 && (
+            <EmptyState title="No requests yet" description="Submit a new household, correction, or mark-deceased request from your dashboard." />
+          )}
 
       <div className="space-y-4">
         {requests.map((r: any) => (
@@ -46,6 +50,8 @@ export default async function MyRequestsPage() {
             </div>
           </div>
         ))}
+      </div>
+      </div>
       </div>
     </div>
   );

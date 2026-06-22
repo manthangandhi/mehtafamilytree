@@ -2,9 +2,9 @@
 
 @theme {
   /* Warm heritage parchment palette - elegant, elder-friendly, timeless for the Mehta Kutumb */
-  --color-background: #f7f3eb;
-  --color-surface: #fffcf7;
-  --color-surface-hover: #f4eee3;
+  --color-background: #faf8f5;
+  --color-surface: #ffffff;
+  --color-surface-hover: #fcfbf9;
   
   --color-primary: #0B2E24;
   --color-primary-hover: #144d3d;
@@ -127,4 +127,71 @@
     color: var(--color-foreground);
     font-weight: 600;
   }
+}
+
+/* --- Google Translate Overrides --- */
+body {
+  top: 0 !important; /* Prevent Google Translate from pushing body down */
+}
+
+/* Hide the Google Translate top banner */
+.skiptranslate iframe, 
+.goog-te-banner-frame {
+  display: none !important;
+}
+
+/* Style the Google Translate dropdown to match the app */
+.goog-te-combo {
+  background-color: var(--color-surface);
+  color: var(--color-foreground);
+  border: 1px solid var(--color-border);
+  border-radius: 9999px; /* full rounded */
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 12px;
+  padding-right: 28px;
+  transition: all 0.2s;
+}
+
+.goog-te-combo:hover, .goog-te-combo:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary-10);
+}
+
+/* Hide the 'Powered by Google' text */
+.goog-logo-link {
+  display: none !important;
+}
+.goog-te-gadget {
+  color: transparent !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+}
+/* Hide the Google Translate branding images and spans */
+.goog-te-gadget > span, 
+.goog-te-gadget img, 
+.goog-te-gadget > div:not(:has(.goog-te-combo)) {
+  display: none !important;
+}
+.goog-te-gadget .goog-te-combo {
+  color: var(--color-foreground) !important;
+  font-size: 12px !important;
+  margin: 0 !important;
+}
+
+/* Force the container to be exactly the height of the dropdown */
+.translate-widget-container {
+  height: 28px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
 }

@@ -6,11 +6,12 @@ export default async function AdminUsersPage() {
   const users = await getAllUsers();
 
   return (
-    <div className="p-8">
-      <h1 className="mb-6 text-2xl font-semibold tracking-tight">User Management</h1>
-      <p className="mb-4 text-sm text-muted">Approve members and confirm their email so they can log in. Use "Confirm Email" for Supabase auth layer.</p>
+    <div className="p-4 sm:p-8 lg:p-12 max-w-[1400px] mx-auto w-full animate-fade-in flex-grow flex flex-col">
+      <h1 className="mb-6 text-3xl font-serif font-bold tracking-tight text-gray-800">User Management</h1>
+      <p className="mb-8 text-sm text-gray-500 max-w-3xl">Approve members and confirm their email so they can log in. Use "Confirm Email" for Supabase auth layer.</p>
 
-      <div className="overflow-x-auto rounded border bg-surface">
+      <div className="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden flex-grow">
+        <div className="overflow-x-auto p-2">
         <table className="table">
           <thead>
             <tr>
@@ -63,6 +64,7 @@ export default async function AdminUsersPage() {
             {users.length === 0 && <tr><td colSpan={6} className="p-6 text-center text-sm">No users found.</td></tr>}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

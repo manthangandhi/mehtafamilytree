@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Textarea } from '@/components/ui/Textarea';
+import { RichTextEditor } from '@/components/admin/RichTextEditor';
 import { updateCulturalPageAction, deleteCulturalPageAction } from '@/lib/actions/culture';
 import { toast } from 'sonner';
 
@@ -55,31 +55,54 @@ export default function EditCulturalPage({ params }: { params: Promise<{ id: str
   };
 
   return (
-    <div className="mx-auto max-w-2xl px-6 py-8">
-      <Link href="/admin/culture">← All Pages</Link>
-      <h1 className="mt-2 text-xl font-semibold">Edit Cultural Page</h1>
-      <form onSubmit={save} className="mt-6 space-y-4 card p-6">
-        <Input label="Title" value={title} onChange={e=>setTitle(e.target.value)} />
-        <div>
-          <label className="label">Language (for speaker mode)</label>
-          <select className="input" value={language} onChange={e=>setLanguage(e.target.value)}>
-            <option value="English">English</option>
-            <option value="Gujarati">Gujarati</option>
-            <option value="Hindi">Hindi</option>
-          </select>
+    <div className="p-6 sm:p-8 lg:p-10 max-w-[1100px] mx-auto w-full">
+      <div className="mb-6">
+        <Link 
+          href="/admin/culture" 
+          className="inline-flex items-center text-sm font-medium text-muted hover:text-primary transition-colors"
+        >
+          ← Back to Cultural Pages
+        </Link>
+      </div>
+
+      <div className="mb-6">
+        <h1 className="text-3xl font-serif font-bold tracking-tight text-gray-800">Edit Cultural Page</h1>
+      </div>
+
+      <form onSubmit={save} className="space-y-6">
+        <div className="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-8">
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-semibold text-foreground mb-2">Title</label>
+              <Input 
+                value={title} 
+                onChange={e=>setTitle(e.target.value)} 
+                className="text-lg py-3" 
+              />
+            </div>
+
+            <div className="max-w-xs">
+              <label className="block text-sm font-semibold text-foreground mb-2">Language</label>
+              <select className="input w-full" value={language} onChange={e=>setLanguage(e.target.value)}>
+                <option value="English">English</option>
+                <option value="Gujarati">Gujarati</option>
+                <option value="Hindi">Hindi</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-foreground mb-2">Content</label>
+              <RichTextEditor 
+                value={content} 
+                onChange={setContent} 
+              />
+            </div>
+          </div>
         </div>
-        <Textarea 
-          label="Content (Markdown supported)" 
-          value={content} 
-          onChange={e=>setContent(e.target.value)} 
-          className="min-h-[280px]" 
-        />
-        <p className="text-xs text-muted -mt-2">
-          Use **bold**, *italic*, - lists, [links](url). Changes are immediately visible to members/viewers based on visibility.
-        </p>
-        <div className="flex gap-3">
-          <Button type="submit" disabled={loading}>Save</Button>
-          <Button type="button" variant="secondary" onClick={del} className="text-accent hover:text-primary hover:bg-accent/10">Delete</Button>
+
+        <div className="flex gap-3 pt-2">
+          <Button type="submit" disabled={loading}>Save Changes</Button>
+          <Button type="button" variant="secondary" onClick={del} className="text-red-600 hover:bg-red-50 border-red-200">Delete Page</Button>
         </div>
       </form>
     </div>

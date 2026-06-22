@@ -74,10 +74,12 @@ export default function FamilyTreeClient() {
         const { data: personsData, error: personsError } = await supabase.from('persons').select('*');
         const { data: householdsData, error: householdsError } = await supabase.from('households').select('*');
         const { data: relationsData, error: relationsError } = await supabase.from('relationships').select('*');
+        const { data: membersData, error: membersError } = await supabase.from('household_members').select('*');
         
         let persons: any[] = personsData || [];
         let households: any[] = householdsData || [];
         let relations: any[] = relationsData || [];
+        let members: any[] = membersData || [];
 
         // NOTE: Mock data fallback has been removed.
         // The visualizer now only shows real data from the database.
@@ -104,6 +106,38 @@ export default function FamilyTreeClient() {
           } else if (rel.relationship_type === 'spouse') {
             if (!spouseMap[rel.person_id]) spouseMap[rel.person_id] = [];
             spouseMap[rel.person_id].push(rel.related_person_id);
+          }
+        });
+
+        // Infer relationships from household members
+        const householdHeadMap: Record<string, string> = {};
+        members.forEach((m: any) => {
+          if (m.is_primary || m.relationship_to_head === 'SELF') {
+            householdHeadMap[m.household_id] = m.person_id;
+          }
+        });
+
+        members.forEach((m: any) => {
+          const headId = householdHeadMap[m.household_id];
+          if (!headId || headId === m.person_id) return;
+          
+          const relType = m.relationship_to_head?.toUpperCase() || '';
+          
+          if (relType === 'SON' || relType === 'DAUGHTER' || relType === 'CHILD') {
+            if (!childrenMap[headId]) childrenMap[headId] = [];
+            if (!childrenMap[headId].includes(m.person_id)) childrenMap[headId].push(m.person_id);
+            if (!parentsMap[m.person_id]) parentsMap[m.person_id] = [];
+            if (!parentsMap[m.person_id].includes(headId)) parentsMap[m.person_id].push(headId);
+          } else if (relType === 'MOTHER' || relType === 'FATHER' || relType === 'PARENT') {
+            if (!childrenMap[m.person_id]) childrenMap[m.person_id] = [];
+            if (!childrenMap[m.person_id].includes(headId)) childrenMap[m.person_id].push(headId);
+            if (!parentsMap[headId]) parentsMap[headId] = [];
+            if (!parentsMap[headId].includes(m.person_id)) parentsMap[headId].push(m.person_id);
+          } else if (relType === 'WIFE' || relType === 'HUSBAND' || relType === 'SPOUSE') {
+            if (!spouseMap[headId]) spouseMap[headId] = [];
+            if (!spouseMap[headId].includes(m.person_id)) spouseMap[headId].push(m.person_id);
+            if (!spouseMap[m.person_id]) spouseMap[m.person_id] = [];
+            if (!spouseMap[m.person_id].includes(headId)) spouseMap[m.person_id].push(headId);
           }
         });
 
