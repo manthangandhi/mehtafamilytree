@@ -10,7 +10,7 @@ export default async function AdminPersons() {
   return (
     <div className="p-4 sm:p-8 lg:p-12 max-w-[1400px] mx-auto w-full animate-fade-in flex-grow flex flex-col">
       <h1 className="mb-6 text-3xl font-serif font-bold tracking-tight text-gray-800">Persons</h1>
-      <div className="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden flex-grow">
+      <div className="premium-card overflow-hidden flex-grow">
         <div className="overflow-x-auto p-2">
           <table className="table">
             <thead>

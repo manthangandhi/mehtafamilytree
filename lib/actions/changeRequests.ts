@@ -177,6 +177,10 @@ export async function approveChangeRequestAction(requestId: string, adminNotes?:
         // 3. Insert all household members + persons
         let order = 1;
         let lastWifeId: string | null = null; // Track most recent spouse to correctly link children for "which wife of which son"
+        const personNameIdMap = new Map<string, string>();
+        if (primaryPerson.full_name) {
+           personNameIdMap.set(primaryPerson.full_name, primaryPerson.id);
+        }
 
         for (const m of members) {
           let personId = m.relationship_to_head === 'SELF' ? primaryPerson.id : null;
@@ -259,6 +263,24 @@ export async function approveChangeRequestAction(requestId: string, adminNotes?:
                   },
                 ]);
               }
+            }
+            
+            if (m.full_name) {
+               personNameIdMap.set(m.full_name, personId);
+            }
+          }
+        }
+
+        // Explicitly link spouses if linked_spouse_name was provided
+        for (const m of members) {
+          if (m.linked_spouse_name && m.full_name) {
+            const p1Id = personNameIdMap.get(m.full_name);
+            const p2Id = personNameIdMap.get(m.linked_spouse_name);
+            if (p1Id && p2Id) {
+               await db.from('relationships').insert([
+                 { person_id: p1Id, related_person_id: p2Id, relationship_type: 'spouse', created_by: req.submitted_by },
+                 { person_id: p2Id, related_person_id: p1Id, relationship_type: 'spouse', created_by: req.submitted_by }
+               ]);
             }
           }
         }

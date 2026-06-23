@@ -28,7 +28,7 @@ export default async function AdminOverview() {
         <p className="text-base text-gray-500 mt-2 max-w-3xl">Manage registrations, life-event news, and directory governance. Registration approval required. After approval, members manage their own households directly (no further approvals needed).</p>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-8 md:p-10 mb-8 flex-grow">
+      <div className="premium-card p-8 md:p-10 mb-8 flex-grow">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
           <Link href="/admin/users" className="bg-gray-50 rounded-3xl border border-gray-100 p-8 hover:border-emerald-200 hover:bg-emerald-50/30 hover:shadow-lg transition-all duration-300 flex flex-col justify-between group">
             <div className="flex items-start justify-between mb-6">
@@ -83,15 +83,15 @@ export default async function AdminOverview() {
           <h2 className="text-2xl font-serif font-bold mb-6 text-gray-800">Quick Actions</h2>
           <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
             <Link href="/admin/households/new" className="bg-primary text-white shadow-[0_8px_20px_rgb(11,46,36,0.2)] hover:bg-primary-hover hover:-translate-y-1 transition-all rounded-2xl inline-flex items-center justify-center px-6 py-5 font-bold tracking-wide whitespace-nowrap">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mr-3"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mr-3"><path d="M12 5v14"/><path d="M5 12h14"/><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" opacity="0.3"/></svg>
               Create Household
             </Link>
             <Link href="/admin/culture/new" className="bg-white border-2 border-primary text-primary shadow-sm hover:bg-emerald-50 hover:-translate-y-1 transition-all rounded-2xl inline-flex items-center justify-center px-6 py-5 font-bold tracking-wide whitespace-nowrap">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mr-3"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mr-3"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/><path d="M12 7v6"/><path d="M9 10h6"/></svg>
               New Cultural Page
             </Link>
             <Link href="/admin/announcements/new" className="bg-white border-2 border-gray-200 text-gray-700 shadow-sm hover:bg-gray-50 hover:border-gray-300 hover:-translate-y-1 transition-all rounded-2xl inline-flex items-center justify-center px-6 py-5 font-bold tracking-wide whitespace-nowrap">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mr-3"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mr-3"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
               Post Announcement
             </Link>
           </div>
@@ -101,7 +101,7 @@ export default async function AdminOverview() {
         <div className="mt-12 pt-10 border-t border-gray-100">
           <h2 className="text-2xl font-serif font-bold mb-6 text-gray-800">Community News & Directory Governance</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 text-sm">
-            <Link href="/admin/announcements/new" className="bg-amber-50 border border-amber-100 rounded-2xl p-6 hover:shadow-md transition-shadow">
+            <Link href="/admin/announcements" className="bg-amber-50 border border-amber-100 rounded-2xl p-6 hover:shadow-md transition-shadow">
               <div className="font-bold text-amber-800 mb-1 text-base">📣 Broadcast Life Events</div>
               <div className="text-amber-600 font-medium">Births • Marriages • Obituaries</div>
             </Link>

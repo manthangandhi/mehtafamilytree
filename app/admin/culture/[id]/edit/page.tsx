@@ -70,7 +70,7 @@ export default function EditCulturalPage({ params }: { params: Promise<{ id: str
       </div>
 
       <form onSubmit={save} className="space-y-6">
-        <div className="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-8">
+        <div className="premium-card p-8">
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-semibold text-foreground mb-2">Title</label>

@@ -67,9 +67,14 @@ export async function createHouseholdAction(formData: unknown) {
       throw new Error(pErr?.message || 'Failed to create primary person');
     }
 
+    const personNameIdMap = new Map<string, string>();
+    if (primaryRow.full_name) {
+       personNameIdMap.set(primaryRow.full_name, primaryPerson.id);
+    }
+
     // 2. Create household
     const householdInsert: HouseholdInsert = {
-      household_code: hData.household_code || null,
+      household_code: (hData.household_code && hData.household_code.trim() !== '') ? hData.household_code.trim() : null,
       primary_member_name: hData.primary_member_name,
       primary_person_id: primaryPerson.id,
       native_place: hData.native_place || null,
@@ -207,6 +212,24 @@ export async function createHouseholdAction(formData: unknown) {
           ]);
         }
       }
+      
+      if (m.full_name) {
+        personNameIdMap.set(m.full_name, newPerson.id);
+      }
+    }
+
+    // Explicitly link spouses if linked_spouse_name was provided
+    for (const m of members) {
+      if (m.linked_spouse_name && m.full_name) {
+        const p1Id = personNameIdMap.get(m.full_name);
+        const p2Id = personNameIdMap.get(m.linked_spouse_name);
+        if (p1Id && p2Id) {
+           await (adminClient.from('relationships') as any).insert([
+             { person_id: p1Id, related_person_id: p2Id, relationship_type: 'spouse', created_by: current.id },
+             { person_id: p2Id, related_person_id: p1Id, relationship_type: 'spouse', created_by: current.id }
+           ]);
+        }
+      }
     }
 
     // Bulk insert household members
@@ -255,9 +278,14 @@ export async function updateHouseholdAction(householdId: string, data: unknown) 
     .eq('id', householdId)
     .single();
 
+  const updateData: any = { ...parsed.data };
+  if (updateData.household_code === '') {
+    updateData.household_code = null;
+  }
+
   const { data: updated, error } = await (adminClient.from('households') as any)
     .update({
-      ...parsed.data,
+      ...updateData,
       updated_by: current.id,
     })
     .eq('id', householdId)
@@ -374,6 +402,22 @@ export async function addMembersToHouseholdAction(householdId: string, membersDa
 
     let displayOrder = 1; // start; in real could query max
 
+    const personNameIdMap = new Map<string, string>();
+    
+    // Fetch existing members to map names to IDs
+    const { data: existingMembers } = await adminClient
+      .from('household_members')
+      .select('person:persons(id, full_name)')
+      .eq('household_id', householdId);
+      
+    if (existingMembers) {
+      existingMembers.forEach((em: any) => {
+        if (em.person?.full_name) {
+           personNameIdMap.set(em.person.full_name, em.person.id);
+        }
+      });
+    }
+
     for (const m of members) {
       if (m.relationship_to_head === 'SELF') continue; // shouldn't add duplicate head
 
@@ -439,6 +483,24 @@ export async function addMembersToHouseholdAction(householdId: string, membersDa
             relationship_type: 'child',
             created_by: current.id,
           });
+        }
+      }
+      
+      if (m.full_name) {
+        personNameIdMap.set(m.full_name, newPerson.id);
+      }
+    }
+
+    // Explicitly link spouses if linked_spouse_name was provided
+    for (const m of members) {
+      if (m.linked_spouse_name && m.full_name) {
+        const p1Id = personNameIdMap.get(m.full_name);
+        const p2Id = personNameIdMap.get(m.linked_spouse_name);
+        if (p1Id && p2Id) {
+           await (adminClient.from('relationships') as any).insert([
+             { person_id: p1Id, related_person_id: p2Id, relationship_type: 'spouse', created_by: current.id },
+             { person_id: p2Id, related_person_id: p1Id, relationship_type: 'spouse', created_by: current.id }
+           ]);
         }
       }
     }
@@ -588,7 +650,7 @@ export async function createMyHouseholdAction(formData: unknown) {
     if (pErr || !primaryPerson) throw new Error(pErr?.message || 'Failed to create primary person');
 
     const householdInsert: any = {
-      household_code: hData.household_code || null,
+      household_code: (hData.household_code && hData.household_code.trim() !== '') ? hData.household_code.trim() : null,
       primary_member_name: hData.primary_member_name,
       primary_person_id: primaryPerson.id,
       native_place: hData.native_place || null,
@@ -730,8 +792,13 @@ export async function updateMyHouseholdAction(householdId: string, data: unknown
   const adminClient = createAdminClient();
   const { data: oldH } = await adminClient.from('households').select('*').eq('id', householdId).single();
 
+  const updateData: any = { ...parsed.data };
+  if (updateData.household_code === '') {
+    updateData.household_code = null;
+  }
+
   const { data: updated, error } = await (adminClient.from('households') as any)
-    .update({ ...parsed.data, updated_by: current.id })
+    .update({ ...updateData, updated_by: current.id })
     .eq('id', householdId)
     .select()
     .single();
@@ -884,7 +951,13 @@ export async function updateMyPersonAction(personId: string, data: unknown) {
 
   const allowed = ['full_name','gender','date_of_birth','date_of_death','is_deceased','education','occupation','marital_status','mobile_number','whatsapp_number','email','blood_group','notes','avatar_url','father_id','mother_id','spouse_id'];
   const updatePayload: any = { updated_by: current.id };
-  Object.keys(data as any).forEach(k => { if (allowed.includes(k)) updatePayload[k] = (data as any)[k]; });
+  Object.keys(data as any).forEach(k => { 
+    if (allowed.includes(k)) {
+      let val = (data as any)[k];
+      if (val === '') val = null;
+      updatePayload[k] = val;
+    }
+  });
 
   const { data: updated, error } = await (adminClient.from('persons') as any)
     .update(updatePayload)
@@ -893,6 +966,40 @@ export async function updateMyPersonAction(personId: string, data: unknown) {
     .single();
 
   if (error) return { success: false, error: error.message };
+
+  // Explicitly link spouse if linked_spouse_name is provided
+  if ((data as any).linked_spouse_name && links?.length) {
+    const householdId = links[0].household_id;
+    const spouseName = (data as any).linked_spouse_name;
+    
+    // Find spouse in the same household
+    const { data: hhMembers } = await adminClient
+      .from('household_members')
+      .select('person:persons(id, full_name)')
+      .eq('household_id', householdId);
+      
+    const spouseMatch = hhMembers?.find((hm: any) => hm.person?.full_name === spouseName) as any;
+    if (spouseMatch?.person?.id) {
+      const spouseId = spouseMatch.person.id;
+      
+      // Delete existing spouse relationships for this person to replace
+      await (adminClient.from('relationships') as any)
+        .delete()
+        .eq('person_id', personId)
+        .eq('relationship_type', 'spouse');
+        
+      await (adminClient.from('relationships') as any)
+        .delete()
+        .eq('person_id', spouseId)
+        .eq('relationship_type', 'spouse');
+
+      // Create new two-way spouse relationship
+      await (adminClient.from('relationships') as any).insert([
+        { person_id: personId, related_person_id: spouseId, relationship_type: 'spouse', created_by: current.id },
+        { person_id: spouseId, related_person_id: personId, relationship_type: 'spouse', created_by: current.id }
+      ]);
+    }
+  }
 
   await logAudit({
     action_type: 'MEMBER_UPDATE_PERSON',

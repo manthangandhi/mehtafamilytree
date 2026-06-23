@@ -30,7 +30,7 @@ export default async function MyRequestsPage() {
 
       <div className="space-y-4">
         {requests.map((r: any) => (
-          <div key={r.id} className="card p-5">
+          <div key={r.id} className="bg-surface-hover border border-border/50 rounded-xl p-5">
             <div className="flex items-start justify-between">
               <div>
                 <div className="font-medium">{r.request_type.replace(/_/g, ' ')}</div>

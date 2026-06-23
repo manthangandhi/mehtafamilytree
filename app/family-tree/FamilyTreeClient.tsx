@@ -2,6 +2,8 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
+import { Button } from '@/components/ui/Button';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { calculateRelationship, getPersonName } from '@/lib/utils/kinship';
 
 interface FamilyTreeClientProps {
@@ -104,7 +106,7 @@ export default function FamilyTreeClient({ treeData, allPersons = [], allRelatio
                       ))}
                     </select>
                   </div>
-                  <button onClick={runRelationship} className="btn btn-primary w-full text-sm">Calculate Relationship</button>
+                  <Button onClick={runRelationship} className="w-full text-sm">Calculate Relationship</Button>
                   {relResult && (
                     <div className="mt-2 p-3 rounded bg-accent/10 border border-accent/30 text-sm font-medium">
                       {relResult}
@@ -123,9 +125,9 @@ export default function FamilyTreeClient({ treeData, allPersons = [], allRelatio
                   <p className="text-white/80 text-sm leading-relaxed mb-6">
                     Your heritage is sacred. We use secure access to ensure your data stays within the family fold.
                   </p>
-                  <button className="text-sm font-bold flex items-center gap-2 hover:translate-x-1 transition-transform">
+                  <Button variant="ghost" className="text-sm font-bold flex items-center gap-2 hover:translate-x-1 transition-transform p-0 h-auto">
                     Manage Permissions <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -168,9 +170,16 @@ export default function FamilyTreeClient({ treeData, allPersons = [], allRelatio
               ))}
               
               {filtered.length === 0 && (
-                <div className="text-center py-24 premium-card bg-surface-hover">
-                  <p className="text-muted mb-2">No households match your search.</p>
-                  <button onClick={() => setSearch('')} className="text-sm font-medium text-accent hover:underline">Clear filters</button>
+                <div className="col-span-full">
+                  <EmptyState
+                    title="No households found"
+                    description="We couldn't find any households matching your search criteria."
+                    action={
+                      <Button variant="ghost" onClick={() => setSearch('')} className="text-sm font-medium text-accent hover:underline p-0 h-auto">
+                        Clear filters
+                      </Button>
+                    }
+                  />
                 </div>
               )}
             </div>

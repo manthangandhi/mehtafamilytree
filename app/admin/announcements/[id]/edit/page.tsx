@@ -1,6 +1,7 @@
 import { requireAdmin } from '@/lib/auth/requireAdmin';
 import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
+import { Button } from '@/components/ui/Button';
 import { updateAnnouncement, deleteAnnouncement } from '@/lib/actions/announcements';
 import { redirect, notFound } from 'next/navigation';
 
@@ -43,9 +44,9 @@ export default async function EditAnnouncement({ params }: { params: Promise<{ i
           <p className="text-muted mt-2">Modify the details of this announcement.</p>
         </div>
         <form action={handleDelete}>
-          <button type="submit" className="text-sm px-4 py-2 text-error hover:bg-error-container hover:text-on-error-container rounded-lg transition-colors font-medium">
+          <Button type="submit" variant="ghost" className="text-error hover:bg-error-container hover:text-on-error-container">
             Delete
-          </button>
+          </Button>
         </form>
       </div>
 
@@ -96,9 +97,9 @@ export default async function EditAnnouncement({ params }: { params: Promise<{ i
           <Link href="/admin/announcements" className="px-6 py-3 font-sans text-sm font-semibold tracking-wide rounded-full text-muted hover:bg-surface transition-colors inline-flex items-center justify-center">
             Cancel
           </Link>
-          <button type="submit" className="bg-primary text-white shadow-lg hover:opacity-90 transition-all transform hover:-translate-y-px inline-flex items-center justify-center px-6 py-3 rounded-full font-sans text-sm font-semibold tracking-wide">
+          <Button type="submit" className="rounded-full shadow-lg">
             Save Changes
-          </button>
+          </Button>
         </div>
       </form>
     </div>

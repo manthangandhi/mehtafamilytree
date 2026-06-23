@@ -113,7 +113,7 @@ function InnerCorrectionForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="card p-8 space-y-5">
+    <form onSubmit={handleSubmit} className="premium-card p-8 md:p-10 space-y-6">
       
       {preselectedHousehold ? (
         <div className="p-5 bg-primary/5 rounded-xl border border-primary/20">

@@ -6,6 +6,9 @@ import { PrivacyField } from '@/components/ui/PrivacyField';
 import { getHouseholdMembers } from '@/lib/actions/persons';
 import { FamilyMembersTable } from '@/components/household/FamilyMembersTable';
 import { FloralBackground } from '@/components/ui/FloralBackground';
+import { DeleteButton } from '@/components/admin/DeleteButton';
+import { deleteHouseholdAdmin } from '@/lib/actions/households';
+import { StickyScrollHeader } from '@/components/layout/StickyScrollHeader';
 
 export default async function HouseholdDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -81,6 +84,13 @@ export default async function HouseholdDetailPage({ params }: { params: Promise<
 
   return (
     <div className="min-h-screen bg-background flex flex-col font-sans">
+      <StickyScrollHeader 
+        title={household.primary_member_name} 
+        subtitle={[household.city, household.state].filter(Boolean).join(', ') || 'Household'} 
+        backLink="/directory"
+        backText="Back to Directory"
+      />
+
       {/* Green edge-to-edge header — exactly matching the directory and other pages */}
       <div className="bg-gradient-to-r from-primary via-[#114536] to-primary text-white shadow-md relative overflow-hidden">
         <FloralBackground opacity="0.10" />
@@ -143,6 +153,18 @@ export default async function HouseholdDetailPage({ params }: { params: Promise<
                 >
                   + Add member
                 </Link>
+              )}
+              {isAdmin && (
+                <div className="ml-2">
+                  <DeleteButton
+                    action={async () => {
+                      'use server';
+                      await deleteHouseholdAdmin(id);
+                    }}
+                    label="Delete Household"
+                    confirmMessage="Permanently delete this household and its member links?"
+                  />
+                </div>
               )}
             </div>
           </div>

@@ -52,3 +52,13 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# Large assets and binaries (prevent push issues)
+*.pdf
+*.tar.gz
+*.zip
+*.mov
+*.mp4
+large-assets/
+*.bak
+*backup*

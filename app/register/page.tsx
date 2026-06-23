@@ -7,6 +7,8 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { toast } from 'sonner';
+import Image from 'next/image';
+import { BrandLogo } from '@/components/ui/BrandLogo';
 
 export default function RegisterPage() {
   const [fullName, setFullName] = useState('');
@@ -60,22 +62,40 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-[80vh] items-center justify-center bg-background px-4 py-10">
-      <div className="w-full max-w-sm animate-fade-in">
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-background to-surface border border-border/50">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <line x1="19" x2="19" y1="8" y2="14" />
-              <line x1="22" x2="16" y1="11" y2="11" />
-            </svg>
-          </div>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Join the Mehta Kutumb</h1>
-          <p className="mt-1 text-sm text-muted">Create an account. An admin will approve your access.</p>
+    <div className="flex min-h-screen bg-background">
+      {/* Right Hero Side (Swapped for variation) */}
+      <div className="hidden lg:block lg:w-1/2 relative bg-primary overflow-hidden">
+        <Image 
+          src="/images/auth-hero.png" 
+          alt="Mehta Kutumb Heritage" 
+          fill 
+          className="object-cover opacity-90 mix-blend-overlay scale-x-[-1]"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/20 to-transparent"></div>
+        <div className="absolute bottom-16 right-16 left-16 text-right">
+          <h2 className="font-serif text-4xl text-white font-bold mb-4 drop-shadow-md">Join the Kutumb</h2>
+          <p className="text-white/80 text-lg ml-auto max-w-md font-medium leading-relaxed">
+            Register to claim your place in the family directory. Preserve your legacy for generations to come.
+          </p>
+        </div>
+      </div>
+
+      {/* Left Form Side */}
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center px-6 py-12 relative z-10">
+        <div className="absolute top-8 right-8 lg:left-8 lg:right-auto">
+          <Link href="/" className="hover:opacity-80 transition-opacity">
+            <BrandLogo />
+          </Link>
         </div>
 
-        <form onSubmit={handleRegister} className="card p-8 space-y-5">
+        <div className="w-full max-w-sm animate-fade-in mt-12 lg:mt-0">
+          <div className="mb-8 text-center">
+            <h1 className="text-3xl font-serif font-bold tracking-tight text-foreground">Create Account</h1>
+            <p className="mt-2 text-[15px] font-medium text-muted">Join the Mehta Kutumb digital directory</p>
+          </div>
+
+        <form onSubmit={handleRegister} className="premium-card p-8 md:p-10 space-y-6">
           <Input
             label="Full Name"
             value={fullName}
@@ -119,9 +139,10 @@ export default function RegisterPage() {
           </p>
         </form>
 
-        <p className="mt-6 text-center text-sm text-muted">
-          Already have an account? <Link href="/login" className="font-medium text-primary hover:text-primary underline underline-offset-2">Sign in</Link>
+        <p className="mt-8 text-center text-[15px] font-medium text-muted">
+          Already have an account? <Link href="/login" className="text-primary hover:text-primary-hover underline underline-offset-4 decoration-accent/50 font-bold transition-all">Sign in</Link>
         </p>
+        </div>
       </div>
     </div>
   );

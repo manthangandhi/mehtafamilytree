@@ -50,7 +50,7 @@ export default function NewCulturalPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Main Form Card */}
-        <div className="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-8">
+        <div className="premium-card p-8">
           <div className="space-y-6">
             {/* Title */}
             <div>

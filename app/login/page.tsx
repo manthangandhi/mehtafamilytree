@@ -8,6 +8,9 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { toast } from 'sonner';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
+import Image from 'next/image';
+import { BrandLogo } from '@/components/ui/BrandLogo';
+import { BrandLoader } from '@/components/ui/BrandLoader';
 
 function LoginForm() {
   const { t } = useLanguage();
@@ -67,7 +70,7 @@ function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleLogin} className="card p-8 space-y-5">
+    <form onSubmit={handleLogin} className="premium-card p-8 md:p-10 space-y-6">
       <Input
         label={t('emailLabel')}
         type="email"
@@ -111,32 +114,48 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-[80vh] items-center justify-center bg-background px-4">
-      <div className="w-full max-w-sm animate-fade-in">
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-background to-surface border border-border/50">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-              <path d="M17 10.5V6a1 1 0 0 0-1-1h-2.5" />
-              <path d="M11 6V3a1 1 0 0 0-1-1H7.5" />
-              <path d="M12 12H3" />
-              <path d="M18 12h3" />
-              <path d="M12 12v9" />
-              <path d="M12 12L3 3" />
-              <path d="m12 12 9-9" />
-            </svg>
-          </div>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Welcome back</h1>
-          <p className="mt-1 text-sm text-muted">Sign in to access the Mehta Kutumb</p>
+    <div className="flex min-h-screen bg-background">
+      {/* Left Form Side */}
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center px-6 py-12 relative z-10">
+        <div className="absolute top-8 left-8">
+          <Link href="/" className="hover:opacity-80 transition-opacity">
+            <BrandLogo />
+          </Link>
         </div>
 
-        <Suspense fallback={<div className="card p-8 text-sm text-muted">Loading...</div>}>
-          <LoginForm />
-        </Suspense>
+        <div className="w-full max-w-sm animate-fade-in mt-12 lg:mt-0">
+          <div className="mb-8 text-center">
+            <h1 className="text-3xl font-serif font-bold tracking-tight text-foreground">Welcome back</h1>
+            <p className="mt-2 text-[15px] font-medium text-muted">Sign in to access your family hub</p>
+          </div>
 
-        <p className="mt-6 text-center text-sm text-muted">
-          Don't have an account?{' '}
-          <Link href="/register" className="font-medium text-primary hover:text-primary underline underline-offset-2">Register here</Link>
-        </p>
+          <Suspense fallback={<BrandLoader />}>
+            <LoginForm />
+          </Suspense>
+
+          <p className="mt-8 text-center text-[15px] font-medium text-muted">
+            Don't have an account?{' '}
+            <Link href="/register" className="text-primary hover:text-primary-hover underline underline-offset-4 decoration-accent/50 font-bold transition-all">Create one here</Link>
+          </p>
+        </div>
+      </div>
+
+      {/* Right Hero Side */}
+      <div className="hidden lg:block lg:w-1/2 relative bg-primary overflow-hidden">
+        <Image 
+          src="/images/auth-hero.png" 
+          alt="Mehta Kutumb Heritage" 
+          fill 
+          className="object-cover opacity-90 mix-blend-overlay"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/20 to-transparent"></div>
+        <div className="absolute bottom-16 left-16 right-16">
+          <h2 className="font-serif text-4xl text-white font-bold mb-4 drop-shadow-md">The Living Archive</h2>
+          <p className="text-white/80 text-lg max-w-md font-medium leading-relaxed">
+            One kutumb, many generations, forever connected. Log in to explore the rich history, lineages, and stories of the Mehta family.
+          </p>
+        </div>
       </div>
     </div>
   );

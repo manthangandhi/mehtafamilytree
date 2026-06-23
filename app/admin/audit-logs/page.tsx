@@ -14,7 +14,7 @@ export default async function AuditLogs() {
       <h1 className="mb-6 text-3xl font-serif font-bold tracking-tight text-gray-800">Audit Logs</h1>
       <p className="mb-8 text-sm text-gray-500 max-w-3xl">Complete record of all privileged admin and system actions.</p>
       
-      <div className="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden flex-grow">
+      <div className="premium-card overflow-hidden flex-grow">
         <div className="overflow-x-auto p-2">
           <table className="table text-xs">
             <thead>

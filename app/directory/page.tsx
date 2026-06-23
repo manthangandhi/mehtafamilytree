@@ -26,67 +26,54 @@ export default async function DirectoryPage({
   const params = await searchParams;
   const supabase = await createClient();
 
-  // Household level filters (location based) - always applied
-  let locationQuery = supabase
-    .from(isApproved ? 'member_households_view' : 'public_households_view')
-    .select('*')
-    .eq('status', 'active');
+  // 1. First find any qualifying household IDs from person searches
+  let personHouseholdIds: string[] = [];
+  const hasPersonFilters = !!(params.q || params.marital_status || params.is_deceased || params.relationship);
 
-  if (params.city) locationQuery = locationQuery.ilike('city', `%${params.city}%`);
-  if (params.state) locationQuery = locationQuery.ilike('state', `%${params.state}%`);
-  if (params.native_place) locationQuery = locationQuery.ilike('native_place', `%${params.native_place}%`);
-
-  const { data: locData } = await locationQuery.order('primary_member_name');
-  const locationHouseholds: any[] = locData || [];
-
-  // Smart search: q matches primary/secondary name OR any person in the household
-  // Person filters (marital, deceased, relationship) also match via household members
-  const hasTextOrPersonFilter = !!(params.q || params.marital_status || params.is_deceased || params.relationship);
-  const qualifyingIds = new Set<string>();
-
-  if (params.q) {
-    const qLower = params.q.toLowerCase();
-    locationHouseholds.forEach((h: any) => {
-      const primary = (h.primary_member_name || '').toLowerCase();
-      const secondary = (h.secondary_member_name || '').toLowerCase();
-      if (primary.includes(qLower) || secondary.includes(qLower)) {
-        qualifyingIds.add(h.id);
-      }
-    });
-  }
-
-  if (isApproved && (params.q || params.marital_status || params.is_deceased || params.relationship)) {
+  if (hasPersonFilters) {
     let memberQuery = supabase
       .from('member_household_members_view')
       .select('household_id');
 
-    if (params.q) {
-      memberQuery = memberQuery.ilike('full_name', `%${params.q}%`);
-    }
-    if (params.marital_status) {
-      memberQuery = memberQuery.ilike('marital_status', `%${params.marital_status}%`);
-    }
+    if (params.q) memberQuery = memberQuery.ilike('full_name', `%${params.q}%`);
+    if (params.marital_status) memberQuery = memberQuery.ilike('marital_status', `%${params.marital_status}%`);
     if (params.is_deceased === 'true') memberQuery = memberQuery.eq('is_deceased', true);
     if (params.is_deceased === 'false') memberQuery = memberQuery.eq('is_deceased', false);
-    if (params.relationship) {
-      memberQuery = memberQuery.eq('relationship_to_head', params.relationship);
-    }
+    if (params.relationship) memberQuery = memberQuery.eq('relationship_to_head', params.relationship);
 
     const { data: memData } = await memberQuery;
-    const memberMatches: any[] = memData || [];
-    const locationIdSet = new Set(locationHouseholds.map((h: any) => h.id));
-    memberMatches.forEach((m: any) => {
-      if (m.household_id && locationIdSet.has(m.household_id)) {
-        qualifyingIds.add(m.household_id);
-      }
-    });
+    if (memData && memData.length > 0) {
+      personHouseholdIds = Array.from(new Set(memData.map((m: any) => m.household_id).filter(Boolean)));
+    }
   }
 
-  let households: any[] = locationHouseholds;
-  if (hasTextOrPersonFilter) {
-    households = locationHouseholds.filter((h: any) => qualifyingIds.has(h.id));
+  // 2. Fetch households
+  let query = supabase
+    .from(isApproved ? 'member_households_view' : 'public_households_view')
+    .select('*')
+    .eq('status', 'active')
+    .order('primary_member_name');
+
+  if (params.q) {
+    if (personHouseholdIds.length > 0) {
+      query = query.or(`primary_member_name.ilike.%${params.q}%,secondary_member_name.ilike.%${params.q}%,id.in.(${personHouseholdIds.join(',')})`);
+    } else {
+      query = query.or(`primary_member_name.ilike.%${params.q}%,secondary_member_name.ilike.%${params.q}%`);
+    }
+  } else if (hasPersonFilters) {
+    if (personHouseholdIds.length > 0) {
+      query = query.in('id', personHouseholdIds);
+    } else {
+      query = query.in('id', ['00000000-0000-0000-0000-000000000000']);
+    }
   }
 
+  if (params.city) query = query.ilike('city', `%${params.city}%`);
+  if (params.state) query = query.ilike('state', `%${params.state}%`);
+  if (params.native_place) query = query.ilike('native_place', `%${params.native_place}%`);
+
+  const { data: householdsData } = await query;
+  const households: any[] = householdsData || [];
   const totalResults = households.length;
 
   return (

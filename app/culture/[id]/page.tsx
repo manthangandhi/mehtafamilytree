@@ -4,6 +4,7 @@ import { getCulturalPageById } from '@/lib/actions/culture';
 import { marked } from 'marked';
 import { SpeakerButton } from '@/components/culture/SpeakerButton';
 import { FloralBackground } from '@/components/ui/FloralBackground';
+import { StickyScrollHeader } from '@/components/layout/StickyScrollHeader';
 
 export default async function CultureDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -21,6 +22,13 @@ export default async function CultureDetail({ params }: { params: Promise<{ id: 
 
   return (
     <div className="min-h-screen bg-background flex flex-col font-sans">
+      <StickyScrollHeader 
+        title={page.title} 
+        subtitle={lang} 
+        backLink="/culture"
+        backText="Back to Culture & History"
+      />
+
       {/* Green edge-to-edge header — matching directory + household details */}
       <div className="bg-gradient-to-r from-primary via-[#114536] to-primary text-white shadow-md relative overflow-hidden">
         <FloralBackground opacity="0.10" />

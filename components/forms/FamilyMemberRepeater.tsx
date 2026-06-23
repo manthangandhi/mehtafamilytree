@@ -120,9 +120,28 @@ export function FamilyMemberRepeater({ members, onChange, allowSelf = true }: Pr
               <Select
                 label="Relationship to Head *"
                 value={m.relationship_to_head}
-                onChange={(e) => updateMember(idx, 'relationship_to_head', e.target.value as any)}
+                onChange={(e) => {
+                   updateMember(idx, 'relationship_to_head', e.target.value as any);
+                   if (!['WIFE', 'HUSBAND', 'DAUGHTER IN LAW', 'SON IN LAW'].includes(e.target.value)) {
+                      updateMember(idx, 'linked_spouse_name', undefined);
+                   }
+                }}
                 options={selectOptions}
               />
+
+              {['WIFE', 'HUSBAND', 'DAUGHTER IN LAW', 'SON IN LAW'].includes(m.relationship_to_head) && (
+                <Select
+                  label="Married To (Spouse)"
+                  value={m.linked_spouse_name || ''}
+                  onChange={(e) => updateMember(idx, 'linked_spouse_name', e.target.value || undefined)}
+                  options={[
+                    { value: '', label: '— Not Specified —' },
+                    ...members
+                      .filter((other, otherIdx) => otherIdx !== idx && other.full_name)
+                      .map(other => ({ value: other.full_name, label: other.full_name }))
+                  ]}
+                />
+              )}
 
               <Select
                 label="Gender"

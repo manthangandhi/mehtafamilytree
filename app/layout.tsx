@@ -20,12 +20,6 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "Mehta Kutumb",
   description: "Our family legacy across generations and borders. A secure digital archive for the Mehta family.",
-  icons: {
-    icon: [
-      { url: "/images/mehta-kutumb-icon.jpg", sizes: "any" },
-    ],
-    apple: "/images/mehta-kutumb-icon.jpg",
-  },
 };
 
 export default function RootLayout({
@@ -39,7 +33,7 @@ export default function RootLayout({
       className={`${inter.variable} ${playfair.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col bg-background text-foreground" suppressHydrationWarning>
+      <body className="min-h-full flex flex-col bg-background text-foreground bg-noise" suppressHydrationWarning>
         <LanguageProvider>
           <AppHeader />
           <div className="flex-1 pt-14 pb-8 bg-background">{children}</div>

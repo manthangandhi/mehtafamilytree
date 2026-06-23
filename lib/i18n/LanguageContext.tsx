@@ -61,7 +61,7 @@ const DICT: Record<Lang, Record<string, string>> = {
     fullDetails: 'Full details visible to approved family members.',
     publicView: 'Public view — private contact details hidden for privacy.',
     oneFamilyNote: 'One family • Many branches across borders • Forever connected',
-    submitNew: '+ Submit New Household',
+    submitNew: 'Submit New Household',
     searchPlaceholder: 'Search name, place...',
     noResults: 'No households or members found matching your search.',
     memberCount: 'Members',

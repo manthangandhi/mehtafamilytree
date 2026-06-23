@@ -24,11 +24,12 @@ export const householdSchema = z.object({
 
 export type HouseholdFormData = z.infer<typeof householdSchema>;
 
-// Family member row used in repeater (for both admin direct + member request)
 export const familyMemberRowSchema = personSchema
   .safeExtend({
+    id: z.string().optional(),
     relationship_to_head: relationshipToHeadSchema,
     is_deceased: z.boolean().default(false),
+    linked_spouse_name: z.string().optional(),
     // display_order handled in action
   });
 

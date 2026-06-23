@@ -2,10 +2,11 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
-import { createClient } from '@/lib/supabase/client';
+import { PageHeader } from '@/components/ui/PageHeader';
 import { toast } from 'sonner';
 import { FloralBackground } from '@/components/ui/FloralBackground';
 
@@ -69,34 +70,16 @@ export default function MyProfileForm({ initialData = {} }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-[#faf8f5] flex flex-col font-sans">
-      
-      {/* Primary Brand Header Banner */}
-      <div className="bg-gradient-to-r from-primary via-[#114536] to-primary text-white shadow-md relative overflow-hidden">
-        <FloralBackground opacity="0.10" />
-        
-        <div className="mx-auto max-w-[95%] xl:max-w-[1400px] px-6 py-10 relative z-10">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div className="flex items-start gap-6">
-              <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-2xl bg-white text-primary shadow-xl border border-white/20">
-                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              </div>
-              <div>
-                <h1 className="font-serif text-4xl md:text-5xl font-extrabold text-white mb-2 drop-shadow-md">
-                  My Profile
-                </h1>
-                <p className="text-[16px] text-white/90 font-medium drop-shadow-sm max-w-xl">
-                  Update your basic profile information
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-background flex flex-col font-sans">
+      <PageHeader
+        title="My Profile"
+        description="Update your basic profile information"
+        icon={<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>}
+      />
 
       <div className="mx-auto max-w-[95%] xl:max-w-[1400px] w-full flex-grow px-6 py-10">
         
-        <div className="mx-auto max-w-2xl bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-8 md:p-10">
+        <div className="mx-auto max-w-2xl premium-card p-8 md:p-10">
           <form onSubmit={handleSubmit} className="space-y-6">
             <Input 
               label="Full Name" 

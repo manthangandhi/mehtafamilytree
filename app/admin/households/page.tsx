@@ -22,7 +22,7 @@ export default async function AdminHouseholds() {
         </Link>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden flex-grow">
+      <div className="premium-card overflow-hidden flex-grow">
         <div className="overflow-x-auto p-2">
         <table className="table">
           <thead>
@@ -42,7 +42,7 @@ export default async function AdminHouseholds() {
                 <td className="font-mono text-xs">{h.household_code || '—'}</td>
                 <td><StatusBadge status={h.status} /></td>
                 <td className="text-right">
-                  <Link href={`/admin/households/${h.id}/edit`} className="text-sm underline">Edit</Link>
+                  <Link href={`/households/${h.id}/edit`} className="text-sm underline">Edit</Link>
                   {' · '}
                   <Link href={`/households/${h.id}`} className="text-sm underline" target="_blank">View</Link>
                   {' · '}

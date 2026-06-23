@@ -74,9 +74,9 @@ export default async function NewAnnouncement() {
           <Link href="/admin/announcements" className="px-6 py-3 font-sans text-sm font-semibold tracking-wide rounded-full text-muted hover:bg-surface transition-colors inline-flex items-center justify-center">
             Cancel
           </Link>
-          <button type="submit" className="bg-primary text-white shadow-lg hover:opacity-90 transition-all transform hover:-translate-y-px inline-flex items-center justify-center px-6 py-3 rounded-full font-sans text-sm font-semibold tracking-wide">
+          <Button type="submit" className="rounded-full shadow-lg">
             Publish Announcement
-          </button>
+          </Button>
         </div>
       </form>
     </div>

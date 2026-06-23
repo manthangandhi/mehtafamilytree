@@ -15,7 +15,7 @@ export default async function AdminCulture() {
         <Link href="/admin/culture/new"><Button variant="primary">New Page</Button></Link>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-8 flex-grow">
+      <div className="premium-card p-8 flex-grow">
         <div className="space-y-4">
           {pages.map((p: any) => (
             <div key={p.id} className="bg-gray-50 border border-gray-100 rounded-2xl flex items-center justify-between p-5 hover:border-primary/30 transition-colors">
