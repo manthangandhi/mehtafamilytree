@@ -1,13 +1,15 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
 import Underline from '@tiptap/extension-underline';
 import TextAlign from '@tiptap/extension-text-align';
-import { Bold, Italic, Underline as UnderlineIcon, List, ListOrdered, Link as LinkIcon, AlignLeft, AlignCenter, AlignRight, Heading2, Heading3, Undo, Redo } from 'lucide-react';
+import { Color } from '@tiptap/extension-color';
+import { TextStyle } from '@tiptap/extension-text-style';
+import { Bold, Italic, Underline as UnderlineIcon, List, ListOrdered, Link as LinkIcon, AlignLeft, AlignCenter, AlignRight, AlignJustify, Heading2, Heading3, Undo, Redo, Quote, Eraser, X } from 'lucide-react';
 
 interface RichTextEditorProps {
   value: string;
@@ -34,6 +36,10 @@ export function RichTextEditor({ value, onChange, placeholder = 'Start writing y
       TextAlign.configure({
         types: ['heading', 'paragraph'],
       }),
+      TextStyle,
+      Color.configure({
+        types: ['textStyle'],
+      }),
       Placeholder.configure({
         placeholder,
       }),
@@ -44,10 +50,20 @@ export function RichTextEditor({ value, onChange, placeholder = 'Start writing y
     },
     editorProps: {
       attributes: {
-        class: 'focus:outline-none min-h-[320px] px-4 py-4 text-[15px] leading-[1.7] text-foreground selection:bg-primary/10',
+        class: 'focus:outline-none min-h-[320px] px-4 py-4 text-[15px] leading-[1.7] selection:bg-primary/10',
       },
     },
   });
+
+  // Update editor when external value changes (e.g. after async fetch in edit form)
+  useEffect(() => {
+    if (editor && value != null) {
+      const currentContent = editor.getHTML();
+      if (value !== currentContent) {
+        editor.commands.setContent(value);
+      }
+    }
+  }, [value, editor]);
 
   if (!editor) {
     return <div className="min-h-[320px] rounded-xl border border-border bg-surface animate-pulse" />;
@@ -151,6 +167,13 @@ export function RichTextEditor({ value, onChange, placeholder = 'Start writing y
           >
             <ListOrdered size={16} />
           </ToolbarButton>
+          <ToolbarButton
+            onClick={() => editor.chain().focus().toggleBlockquote().run()}
+            isActive={editor.isActive('blockquote')}
+            title="Quote / Blockquote"
+          >
+            <Quote size={16} />
+          </ToolbarButton>
         </div>
 
         <div className="flex items-center gap-1 px-2 border-r border-border/60">
@@ -175,15 +198,58 @@ export function RichTextEditor({ value, onChange, placeholder = 'Start writing y
           >
             <AlignRight size={16} />
           </ToolbarButton>
+          <ToolbarButton
+            onClick={() => editor.chain().focus().setTextAlign('justify').run()}
+            isActive={editor.isActive({ textAlign: 'justify' })}
+            title="Justify"
+          >
+            <AlignJustify size={16} />
+          </ToolbarButton>
         </div>
 
-        <div className="flex items-center gap-1 px-2">
+        <div className="flex items-center gap-1 px-2 border-r border-border/60">
           <ToolbarButton
             onClick={toggleLink}
             isActive={editor.isActive('link')}
             title="Insert Link"
           >
             <LinkIcon size={16} />
+          </ToolbarButton>
+        </div>
+
+        {/* Color and Remove Formatting */}
+        <div className="flex items-center gap-1 px-2 border-r border-border/60">
+          <input
+            type="color"
+            title="Text color"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              editor.chain().focus().run();
+            }}
+            onChange={(e) => {
+              const color = e.target.value;
+              editor.chain().focus().setColor(color).run();
+              // Force a view update so the color appears immediately in the editor
+              setTimeout(() => {
+                if (editor) {
+                  editor.view.dispatch(editor.state.tr);
+                  editor.view.focus();
+                }
+              }, 0);
+            }}
+            className="w-6 h-6 p-0 border border-border rounded cursor-pointer bg-transparent"
+          />
+          <ToolbarButton
+            onClick={() => editor.chain().focus().unsetColor().run()}
+            title="Remove text color"
+          >
+            <Eraser size={16} />
+          </ToolbarButton>
+          <ToolbarButton
+            onClick={() => editor.chain().focus().clearNodes().unsetAllMarks().run()}
+            title="Remove all formatting"
+          >
+            <X size={16} />
           </ToolbarButton>
         </div>
 
@@ -206,12 +272,16 @@ export function RichTextEditor({ value, onChange, placeholder = 'Start writing y
       {/* Editor Area */}
       <div className="bg-white">
         <style>{`
+          .tiptap {
+            color: #111827; /* default dark text for the editor */
+          }
           .tiptap h2 { font-size: 1.35rem; font-weight: 700; margin: 1.25rem 0 0.5rem; font-family: var(--font-serif, serif); }
           .tiptap h3 { font-size: 1.1rem; font-weight: 600; margin: 1rem 0 0.4rem; }
           .tiptap ul, .tiptap ol { padding-left: 1.35rem; margin: 0.5rem 0; }
           .tiptap li { margin: 0.2rem 0; }
           .tiptap p { margin: 0.45rem 0; }
           .tiptap a { color: #0B2E24; text-decoration: underline; }
+          /* Inline styles for color (from setColor) will be respected by the browser */
         `}</style>
         <EditorContent editor={editor} />
       </div>

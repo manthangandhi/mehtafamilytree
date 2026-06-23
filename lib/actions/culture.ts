@@ -16,7 +16,7 @@ export async function getCulturalPages(visibilityFor: 'public' | 'member' = 'pub
   let query = supabase
     .from('cultural_pages')
     .select('id, title, language, visibility_level, created_at')
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: true });
 
   if (visibilityFor === 'public') {
     query = query.eq('visibility_level', 'public');
@@ -45,7 +45,7 @@ export async function getAllCulturalPagesAdmin() {
   const { data } = await adminClient
     .from('cultural_pages')
     .select('*')
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: true });
   return data ?? [];
 }
 

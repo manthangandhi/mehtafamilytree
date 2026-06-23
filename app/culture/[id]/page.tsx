@@ -11,9 +11,10 @@ export default async function CultureDetail({ params }: { params: Promise<{ id: 
 
   if (!page) notFound();
 
-  // Support both old Markdown content and new rich HTML content
+  // Support both old Markdown content and new rich HTML content from the editor
   const raw = page.content || '';
-  const htmlContent = raw.trim().startsWith('<') 
+  const looksLikeHtml = /<[a-z][\s\S]*>/i.test(raw.trim());
+  const htmlContent = looksLikeHtml 
     ? raw 
     : marked.parse(raw) as string;
   const lang = page.language || 'English';
@@ -69,7 +70,7 @@ export default async function CultureDetail({ params }: { params: Promise<{ id: 
       {/* Content below green header — consistent container + styling */}
       <div className="mx-auto max-w-[95%] xl:max-w-[1400px] px-6 w-full flex-grow py-8">
         <article 
-          className="prose-heritage max-w-none leading-relaxed text-foreground animate-fade-in bg-surface rounded-3xl p-8 md:p-12 border border-border/70 premium-card"
+          className="prose-heritage max-w-none leading-relaxed animate-fade-in bg-surface rounded-3xl p-8 md:p-12 border border-border/70 premium-card"
           dangerouslySetInnerHTML={{ __html: htmlContent }}
         />
 
